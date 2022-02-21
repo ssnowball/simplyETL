@@ -1,0 +1,1804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>{{.title}}</title>
+  <meta name="description" content="query builder">
+
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jerosoler/Drawflow@0.0.48/dist/drawflow.min.css">
+  <link rel="stylesheet" type="text/css" href="/assets/beautiful.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css" integrity="sha256-h20CPZ0QyXlBuAw7A+KluUYx/3pK+c7lYEpqLTlxjYQ=" crossorigin="anonymous" />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+  <link href="https://unpkg.com/tabulator-tables/dist/css/tabulator.min.css" rel="stylesheet">
+  
+    <link rel="stylesheet" type="text/css" href="/assets/normalize.css">
+    <link rel="stylesheet" type="text/css" href="/assets/skeleton.css">
+
+    <link rel="stylesheet" href="/assets/style.css">
+
+</head>
+<body> 
+
+  <div class="wrapper">
+    <div class="col">
+        <div class="drag-drawflow" draggable="true" ondragstart="drag(event)" data-node="start">
+            <i class="fas fa-genderless"></i><span> Start</span>
+        </div>
+      <div class="drag-drawflow" draggable="true" ondragstart="drag(event)" data-node="datasource">
+        <i class="fas fa-database"></i><span> Data Source</span>
+      </div>
+      <div class="drag-drawflow" draggable="true" ondragstart="drag(event)" data-node="dataget">
+        <i class="fas fa-database"></i><span> Data Get</span>
+      </div>
+      <div class="drag-drawflow" draggable="true" ondragstart="drag(event)" data-node="join">
+        <i class="far fa-object-group"></i><span> Join</span>
+      </div>
+      <div class="drag-drawflow" draggable="true" ondragstart="drag(event)" data-node="union">
+        <i class="far fa-object-group"></i><span> Union</span>
+      </div>
+      <!-- <div class="drag-drawflow" draggable="true" ondragstart="drag(event)" data-node="mutateadd">
+        <i class="fas fa-exchange-alt"></i><span> MutateAdd</span>
+      </div>
+      <div class="drag-drawflow" draggable="true" ondragstart="drag(event)" data-node="mutatechange">
+        <i class="fas fa-exchange-alt"></i><span> MutateChange</span>
+      </div> -->
+      <div class="drag-drawflow" draggable="true" ondragstart="drag(event)" data-node="filterand">
+        <i class="fas fa-filter"></i><span> FilterAnd</span>
+      </div>
+      <div class="drag-drawflow" draggable="true" ondragstart="drag(event)" data-node="filteror">
+        <i class="fas fa-filter"></i><span> FilterOr</span>
+      </div>
+      <div class="drag-drawflow" draggable="true" ondragstart="drag(event)" data-node="groupby">
+        <i class="fas fa-layer-group"></i><span> GroupBy</span>
+      </div>
+      <div class="drag-drawflow" draggable="true" ondragstart="drag(event)" data-node="aggregate">
+        <i class="fas fa-calculator"></i><span> Aggregate</span>
+      </div>      
+      <div class="drag-drawflow" draggable="true" ondragstart="drag(event)" data-node="havingand">
+        <i class="fas fa-filter"></i><span> HavingAnd</span>
+      </div>
+      <div class="drag-drawflow" draggable="true" ondragstart="drag(event)" data-node="havingor">
+        <i class="fas fa-filter"></i><span> HavingOr</span>
+      </div>
+      <div class="drag-drawflow" draggable="true" ondragstart="drag(event)" data-node="select">
+        <i class="fas fa-columns"></i><span> Select</span>
+      </div>
+      <div class="drag-drawflow" draggable="true" ondragstart="drag(event)" data-node="arrange">
+        <i class="fas fa-sort-amount-up-alt"></i><span> Arrange</span>
+      </div>
+      <div class="drag-drawflow" draggable="true" ondragstart="drag(event)" data-node="subset">
+        <i class="fas fa-grip-lines"></i><span> Subset</span>
+      </div>
+      <div class="drag-drawflow" draggable="true" ondragstart="drag(event)" data-node="rename">
+        <i class="fas fa-signature"></i><span> Rename</span>
+      </div>
+      <div class="drag-drawflow" draggable="true" ondragstart="drag(event)" data-node="end">
+        <i class="fas fa-genderless"></i><span> End</span>
+      </div>
+    </div>
+    
+
+      
+      <div id="drawflow" ondrop="drop(event)" ondragover="allowDrop(event)">
+
+        <!-- <div class="btn-export" onclick="">Export</div> -->
+        <div class="btn-export" onclick="runCode(editor.export())">Export</div>
+        <!-- <div class="btn-export" onclick="Swal.fire({ title: 'Export', html: '<pre><code>'+JSON.stringify(editor.export(), null,4)+'</code></pre>'})">Export</div> -->
+        <div class="btn-clear" onclick="editor.clearModuleSelected()">Clear</div>
+        <div class="btn-lock">
+          <i id="lock" class="fas fa-lock" onclick="editor.editor_mode='fixed'; changeMode('lock');"></i>
+          <i id="unlock" class="fas fa-lock-open" onclick="editor.editor_mode='edit'; changeMode('unlock');" style="display:none;"></i>
+        </div>
+        <div class="bar-zoom">
+          <i class="fas fa-search-minus" onclick="editor.zoom_out()"></i>
+          <i class="fas fa-search" onclick="editor.zoom_reset()"></i>
+          <i class="fas fa-search-plus" onclick="editor.zoom_in()"></i>
+        </div>
+      </div>
+    <!-- </div> -->
+
+    <div class="col">
+      Settings
+      <div id="settings-detail"></div>
+    </div>
+
+</div>
+
+  <div class="row">
+    <div class="column">
+      DataSource Columns
+      <div id="column-table"></div>
+    </div>
+  </div>
+
+
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/jerosoler/Drawflow/dist/drawflow.min.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/js/all.min.js" integrity="sha256-KzZiKy0DWYsnwMF+X1DvQngQ2/FxF7MF3Ff72XcpuPs=" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+  <script type="text/javascript" src="https://unpkg.com/micromodal/dist/micromodal.min.js"></script>
+  <script type="text/javascript" src="https://unpkg.com/tabulator-tables/dist/js/tabulator.min.js"></script>
+
+  <script>
+
+
+    // var DataColumns = [];
+
+
+    var columnTable = new Tabulator("#column-table", {
+        height:45, // set height of table (in CSS or here), this enables the Virtual DOM and improves render speed dramatically (can be any valid css height value)
+        data:[], //assign data to table
+        placeholder:"No Datasource selected",
+        layout:"fitColumns", //fit columns to width of table (optional)
+        autoColumns:true,
+        headerVisible:false,
+      });
+
+    var id = document.getElementById("drawflow");
+    const editor = new Drawflow(id);
+    editor.reroute = true;
+    // const dataToImport = {"drawflow":{"Home":{"data":{"1":{"id":1,"name":"welcome","data":{},"class":"welcome","html":"\n    <div>\n      <div class=\"title-box\">👏 Welcome!!</div>\n      <div class=\"box\">\n        <p>Simple flow library <b>demo</b>\n        <a href=\"https://github.com/jerosoler/Drawflow\" target=\"_blank\">Drawflow</a> by <b>Jero Soler</b></p><br>\n\n        <p>Multiple input / outputs<br>\n           Data sync nodes<br>\n           Import / export<br>\n           Modules support<br>\n           Simple use<br>\n           Type: Fixed or Edit<br>\n           Events: view console<br>\n           Pure Javascript<br>\n        </p>\n        <br>\n        <p><b><u>Shortkeys:</u></b></p>\n        <p>🎹 <b>Delete</b> for remove selected<br>\n        💠 Mouse Left Click == Move<br>\n        ❌ Mouse Right == Delete Option<br>\n        🔍 Ctrl + Wheel == Zoom<br>\n        📱 Mobile support<br>\n        ...</p>\n      </div>\n    </div>\n    ","typenode": false, "inputs":{},"outputs":{},"pos_x":50,"pos_y":50},"2":{"id":2,"name":"slack","data":{},"class":"slack","html":"\n          <div>\n            <div class=\"title-box\"><i class=\"fab fa-slack\"></i> Slack chat message</div>\n          </div>\n          ","typenode": false, "inputs":{"input_1":{"connections":[{"node":"7","input":"output_1"}]}},"outputs":{},"pos_x":1028,"pos_y":87},"3":{"id":3,"name":"telegram","data":{"channel":"channel_2"},"class":"telegram","html":"\n          <div>\n            <div class=\"title-box\"><i class=\"fab fa-telegram-plane\"></i> Telegram bot</div>\n            <div class=\"box\">\n              <p>Send to telegram</p>\n              <p>select channel</p>\n              <select df-channel>\n                <option value=\"channel_1\">Channel 1</option>\n                <option value=\"channel_2\">Channel 2</option>\n                <option value=\"channel_3\">Channel 3</option>\n                <option value=\"channel_4\">Channel 4</option>\n              </select>\n            </div>\n          </div>\n          ","typenode": false, "inputs":{"input_1":{"connections":[{"node":"7","input":"output_1"}]}},"outputs":{},"pos_x":1032,"pos_y":184},"4":{"id":4,"name":"email","data":{},"class":"email","html":"\n            <div>\n              <div class=\"title-box\"><i class=\"fas fa-at\"></i> Send Email </div>\n            </div>\n            ","typenode": false, "inputs":{"input_1":{"connections":[{"node":"5","input":"output_1"}]}},"outputs":{},"pos_x":1033,"pos_y":439},"5":{"id":5,"name":"template","data":{"template":"Write your template"},"class":"template","html":"\n            <div>\n              <div class=\"title-box\"><i class=\"fas fa-code\"></i> Template</div>\n              <div class=\"box\">\n                Ger Vars\n                <textarea df-template></textarea>\n                Output template with vars\n              </div>\n            </div>\n            ","typenode": false, "inputs":{"input_1":{"connections":[{"node":"6","input":"output_1"}]}},"outputs":{"output_1":{"connections":[{"node":"4","output":"input_1"},{"node":"11","output":"input_1"}]}},"pos_x":607,"pos_y":304},"6":{"id":6,"name":"github","data":{"name":"https://github.com/jerosoler/Drawflow"},"class":"github","html":"\n          <div>\n            <div class=\"title-box\"><i class=\"fab fa-github \"></i> Github Stars</div>\n            <div class=\"box\">\n              <p>Enter repository url</p>\n            <input type=\"text\" df-name>\n            </div>\n          </div>\n          ","typenode": false, "inputs":{},"outputs":{"output_1":{"connections":[{"node":"5","output":"input_1"}]}},"pos_x":341,"pos_y":191},"7":{"id":7,"name":"facebook","data":{},"class":"facebook","html":"\n        <div>\n          <div class=\"title-box\"><i class=\"fab fa-facebook\"></i> Facebook Message</div>\n        </div>\n        ","typenode": false, "inputs":{},"outputs":{"output_1":{"connections":[{"node":"2","output":"input_1"},{"node":"3","output":"input_1"},{"node":"11","output":"input_1"}]}},"pos_x":347,"pos_y":87},"11":{"id":11,"name":"log","data":{},"class":"log","html":"\n            <div>\n              <div class=\"title-box\"><i class=\"fas fa-file-signature\"></i> Save log file </div>\n            </div>\n            ","typenode": false, "inputs":{"input_1":{"connections":[{"node":"5","input":"output_1"},{"node":"7","input":"output_1"}]}},"outputs":{},"pos_x":1031,"pos_y":363}}},"Other":{"data":{"8":{"id":8,"name":"personalized","data":{},"class":"personalized","html":"\n            <div>\n              Personalized\n            </div>\n            ","typenode": false, "inputs":{"input_1":{"connections":[{"node":"12","input":"output_1"},{"node":"12","input":"output_2"},{"node":"12","input":"output_3"},{"node":"12","input":"output_4"}]}},"outputs":{"output_1":{"connections":[{"node":"9","output":"input_1"}]}},"pos_x":764,"pos_y":227},"9":{"id":9,"name":"dbclick","data":{"name":"Hello World!!"},"class":"dbclick","html":"\n            <div>\n            <div class=\"title-box\"><i class=\"fas fa-mouse\"></i> Db Click</div>\n              <div class=\"box dbclickbox\" ondblclick=\"showpopup(event)\">\n                Db Click here\n                <div class=\"modal\" style=\"display:none\">\n                  <div class=\"modal-content\">\n                    <span class=\"close\" onclick=\"closemodal(event)\">&times;</span>\n                    Change your variable {name} !\n                    <input type=\"text\" df-name>\n                  </div>\n\n                </div>\n              </div>\n            </div>\n            ","typenode": false, "inputs":{"input_1":{"connections":[{"node":"8","input":"output_1"}]}},"outputs":{"output_1":{"connections":[{"node":"12","output":"input_2"}]}},"pos_x":209,"pos_y":38},"12":{"id":12,"name":"multiple","data":{},"class":"multiple","html":"\n            <div>\n              <div class=\"box\">\n                Multiple!\n              </div>\n            </div>\n            ","typenode": false, "inputs":{"input_1":{"connections":[]},"input_2":{"connections":[{"node":"9","input":"output_1"}]},"input_3":{"connections":[]}},"outputs":{"output_1":{"connections":[{"node":"8","output":"input_1"}]},"output_2":{"connections":[{"node":"8","output":"input_1"}]},"output_3":{"connections":[{"node":"8","output":"input_1"}]},"output_4":{"connections":[{"node":"8","output":"input_1"}]}},"pos_x":179,"pos_y":272}}}}}
+    editor.start();
+    // editor.import(dataToImport);
+
+    // Events!
+    editor.on('nodeCreated', function(id) {
+      console.log("Node created " + id);
+
+      let node = editor.getNodeFromId(id);
+
+      let innerHTML = "";
+
+      switch (node.name) {
+        case "start":
+          innerHTML = `<div> Start Flow </div>`
+          break;
+        case "end":
+          innerHTML = `<div> End Flow </div>`
+          break;     
+        default:
+          innerHTML = `<div> `+ node.name +`</div><div> Please create connections for available options </div>`
+          break;
+      }
+
+
+      document.getElementById("settings-detail").innerHTML = innerHTML;
+    })
+
+    editor.on('nodeRemoved', function(id) {
+      console.log("Node removed " + id);
+      document.getElementById("settings-detail").innerHTML = "";
+    })
+
+    editor.on('nodeSelected', function(id) {
+
+      let node = editor.getNodeFromId(id);
+
+      console.log(node);
+
+      if (node.name == "start" || node.name == "end") {
+          document.getElementById("settings-detail").innerHTML = `<div>`+ node.name +`</div>`;
+          return
+      }
+
+      if (node.inputs.input_1.connections.length == 0) {
+          document.getElementById("settings-detail").innerHTML = `<div>no connections</div>`;
+          return
+      }
+      document.getElementById("settings-detail").innerHTML = "";
+
+
+      let nodeparent = editor.getNodeFromId(node.inputs.input_1.connections[0].node);
+
+      if (typeof node.data.columns != "undefined" && node.data.columns != null) {
+              columnTable.setData(node.data.columns);
+          } else {
+              columnTable.setData([]);
+          }
+
+      switch (node.name) {
+        case "datasource":
+            datasourceBuild(node.id, node.data);
+          break;
+        case "dataget":
+        if (node.inputs.input_1.connections.length != 1) {
+                document.getElementById("settings-detail").innerHTML = `<div>only 1 parent</div>`;
+                return
+              }
+            // if parent node doesnt contain columns nok
+            if (typeof nodeparent.data.tables == "undefined" && nodeparent.data.tables == null) {
+              document.getElementById("settings-detail").innerHTML = `<div>no datasource connected</div>`;
+              return
+            }
+            if (nodeparent.name != "datasource") {
+                document.getElementById("settings-detail").innerHTML = `<div>parent must be datasource</div>`;
+                return
+              }
+
+            datagetBuild(node.id, node.data, nodeparent.data);
+          break;
+        case "filterand":
+            if (node.inputs.input_1.connections.length != 1) {
+                document.getElementById("settings-detail").innerHTML = `<div>only 1 parent</div>`;
+                return
+              }
+            // if parent node doesnt contain columns nok
+            if (typeof nodeparent.data.columns == "undefined" && nodeparent.data.columns == null) {
+              document.getElementById("settings-detail").innerHTML = `<div>no datasource columns</div>`;
+              return
+            }
+            filterAndBuild(node.id, node.data, nodeparent.data);
+          break;
+        case "filteror":
+        if (node.inputs.input_1.connections.length != 1) {
+                document.getElementById("settings-detail").innerHTML = `<div>only 1 parent</div>`;
+                return
+              }
+            // if parent node doesnt contain columns nok
+            if (typeof nodeparent.data.columns == "undefined" && nodeparent.data.columns == null) {
+              document.getElementById("settings-detail").innerHTML = `<div>no datasource columns</div>`;
+              return
+            }
+            filterOrBuild(node.id, node.data, nodeparent.data);
+          break;
+        case "select":
+        if (node.inputs.input_1.connections.length != 1) {
+                document.getElementById("settings-detail").innerHTML = `<div>only 1 parent</div>`;
+                return
+              }
+              // if parent node doesnt contain columns nok
+              if (typeof nodeparent.data.columns == "undefined" && nodeparent.data.columns == null) {
+                document.getElementById("settings-detail").innerHTML = `<div>no datasource columns</div>`;
+                return
+              }
+              selectBuild(node.id, node.data, nodeparent.data);
+          break;
+        case "arrange":
+        if (node.inputs.input_1.connections.length != 1) {
+                document.getElementById("settings-detail").innerHTML = `<div>only 1 parent</div>`;
+                return
+              }
+              // if parent node doesnt contain columns nok
+              if (typeof nodeparent.data.columns == "undefined" && nodeparent.data.columns == null) {
+                document.getElementById("settings-detail").innerHTML = `<div>no datasource columns</div>`;
+                return
+              }
+              arrangeBuild(node.id, node.data, nodeparent.data);
+          break;
+        case "subset":
+        if (node.inputs.input_1.connections.length != 1) {
+                document.getElementById("settings-detail").innerHTML = `<div>only 1 parent</div>`;
+                return
+              }
+              // if parent node doesnt contain columns nok
+              if (typeof nodeparent.data.columns == "undefined" && nodeparent.data.columns == null) {
+                document.getElementById("settings-detail").innerHTML = `<div>no datasource columns</div>`;
+                return
+              }
+              subsetBuild(node.id, node.data, nodeparent.data);
+          break;
+        case "rename":
+
+            if (node.inputs.input_1.connections.length != 1) {
+                document.getElementById("settings-detail").innerHTML = `<div>only 1 parent</div>`;
+                return
+              }
+
+
+              // if parent node doesnt contain columns nok
+              if (typeof nodeparent.data.columns == "undefined" && nodeparent.data.columns == null) {
+                document.getElementById("settings-detail").innerHTML = `<div>no datasource columns</div>`;
+                return
+              }
+              renameBuild(node.id, node.data, nodeparent.data);
+          break;
+        case "join":
+            if (node.inputs.input_1.connections.length != 2) {
+                document.getElementById("settings-detail").innerHTML = `<div>need 2 datasources</div>`;
+                return
+              }
+
+              let nodeparentB = editor.getNodeFromId(node.inputs.input_1.connections[1].node);
+
+              // if parent node doesnt contain columns nok
+              if (typeof nodeparent.data.columns == "undefined" && nodeparent.data.columns == null) {
+                document.getElementById("settings-detail").innerHTML = `<div>no datasource columns</div>`;
+                return
+              }
+              
+              if (typeof nodeparentB.data.columns == "undefined" && nodeparentB.data.columns == null) {
+                document.getElementById("settings-detail").innerHTML = `<div>no datasource columns</div>`;
+                return
+              }
+              
+              joinBuild(node.id, node.data, nodeparent.data, nodeparentB.data);
+          break;
+        case "groupby":
+        if (node.inputs.input_1.connections.length != 1) {
+                document.getElementById("settings-detail").innerHTML = `<div>only 1 parent</div>`;
+                return
+              }
+              // if parent node doesnt contain columns nok
+              if (typeof nodeparent.data.columns == "undefined" && nodeparent.data.columns == null) {
+                document.getElementById("settings-detail").innerHTML = `<div>no datasource columns</div>`;
+                return
+              }
+              groupbyBuild(node.id, node.data, nodeparent.data);
+          break;
+        case "aggregate":
+        if (node.inputs.input_1.connections.length != 1) {
+                document.getElementById("settings-detail").innerHTML = `<div>only 1 parent</div>`;
+                return
+              }
+            // if parent node doesnt contain columns nok
+            if (typeof nodeparent.data.columns == "undefined" && nodeparent.data.columns == null) {
+              document.getElementById("settings-detail").innerHTML = `<div>no datasource columns</div>`;
+              return
+            }
+
+            let typer = "groupby";
+            // if (nodeparent.name != "groupby" || nodeparent.name != "aggregate") {
+            if (nodeparent.name != "groupby") {
+              if (nodeparent.name != "aggregate") {
+                document.getElementById("settings-detail").innerHTML = `<div>parent must be groupby or aggregate node</div>`;
+                return
+              } else {
+                typer = "aggregate";
+              }
+              
+            }
+
+            aggregateBuild(node.id, node.data, nodeparent.data, nodeparent.id, typer);
+          break;
+          case "havingand":
+          if (node.inputs.input_1.connections.length != 1) {
+                document.getElementById("settings-detail").innerHTML = `<div>only 1 parent</div>`;
+                return
+              }
+            // if parent node doesnt contain columns nok
+            if (typeof nodeparent.data.columns == "undefined" && nodeparent.data.columns == null) {
+              document.getElementById("settings-detail").innerHTML = `<div>no datasource columns</div>`;
+              return
+            }
+            havingAndBuild(node.id, node.data, nodeparent.data);
+          break;
+        case "havingor":
+        if (node.inputs.input_1.connections.length != 1) {
+                document.getElementById("settings-detail").innerHTML = `<div>only 1 parent</div>`;
+                return
+              }
+            // if parent node doesnt contain columns nok
+            if (typeof nodeparent.data.columns == "undefined" && nodeparent.data.columns == null) {
+              document.getElementById("settings-detail").innerHTML = `<div>no datasource columns</div>`;
+              return
+            }
+            havingOrBuild(node.id, node.data, nodeparent.data);
+          break;     
+        default:
+          break;
+      }
+
+    })
+
+    editor.on('moduleCreated', function(name) {
+      console.log("Module Created " + name);
+    })
+
+    editor.on('moduleChanged', function(name) {
+      console.log("Module Changed " + name);
+    })
+
+    editor.on('connectionCreated', function(connection) {
+      console.log('Connection created');
+      console.log(connection);
+
+
+      let node = editor.getNodeFromId(connection.input_id);
+      let nodeparent = editor.getNodeFromId(connection.output_id);
+
+      if (node.name == "start" || node.name == "end") {
+          document.getElementById("settings-detail").innerHTML = `<div>`+ node.name +`</div>`;
+          return
+      }
+
+      if (node.inputs.input_1.connections.length == 0) {
+          document.getElementById("settings-detail").innerHTML = `<div>no connections</div>`;
+          return
+      }
+      document.getElementById("settings-detail").innerHTML = "";
+
+      switch (node.name) {
+        case "datasource":
+            datasourceBuild(node.id, node.data);
+          break;
+        case "dataget":
+            if (typeof nodeparent.data.tables == "undefined" && nodeparent.data.tables == null) {
+                  document.getElementById("settings-detail").innerHTML = `<div>no datasource connected</div>`;
+                  return
+                }
+
+                if (nodeparent.name != "datasource") {
+                document.getElementById("settings-detail").innerHTML = `<div>parent must be datasource</div>`;
+                return
+              }
+
+            datagetBuild(node.id, node.data, nodeparent.data);
+          break;
+        case "filterand":
+            // if parent node doesnt contain columns nok
+            if (typeof nodeparent.data.columns == "undefined" && nodeparent.data.columns == null) {
+              document.getElementById("settings-detail").innerHTML = `<div>no datasource columns</div>`;
+              return
+            }
+            filterAndBuild(node.id, node.data, nodeparent.data);
+          break;
+        case "filteror":
+            // if parent node doesnt contain columns nok
+            if (typeof nodeparent.data.columns == "undefined" && nodeparent.data.columns == null) {
+              document.getElementById("settings-detail").innerHTML = `<div>no datasource columns</div>`;
+              return
+            }
+            filterOrBuild(node.id, node.data, nodeparent.data);
+          break;
+        case "select":
+            // if parent node doesnt contain columns nok
+            if (typeof nodeparent.data.columns == "undefined" && nodeparent.data.columns == null) {
+              document.getElementById("settings-detail").innerHTML = `<div>no datasource columns</div>`;
+              return
+            }
+            selectBuild(node.id, node.data, nodeparent.data);
+          break;
+        case "arrange":
+            // if parent node doesnt contain columns nok
+            if (typeof nodeparent.data.columns == "undefined" && nodeparent.data.columns == null) {
+              document.getElementById("settings-detail").innerHTML = `<div>no datasource columns</div>`;
+              return
+            }
+            arrangeBuild(node.id, node.data, nodeparent.data);
+          break;
+        case "subset":
+            // if parent node doesnt contain columns nok
+            if (typeof nodeparent.data.columns == "undefined" && nodeparent.data.columns == null) {
+              document.getElementById("settings-detail").innerHTML = `<div>no datasource columns</div>`;
+              return
+            }
+            subsetBuild(node.id, node.data, nodeparent.data);
+          break;
+        case "rename":
+            // if parent node doesnt contain columns nok
+            if (typeof nodeparent.data.columns == "undefined" && nodeparent.data.columns == null) {
+              document.getElementById("settings-detail").innerHTML = `<div>no datasource columns</div>`;
+              return
+            }
+            renameBuild(node.id, node.data, nodeparent.data);
+          break;
+        case "join":
+            // if parent node doesnt contain columns nok
+            if (typeof nodeparent.data.columns == "undefined" && nodeparent.data.columns == null) {
+              document.getElementById("settings-detail").innerHTML = `<div>no datasource columns</div>`;
+              return
+            }
+            if (node.inputs.input_1.connections.length != 2) {
+                document.getElementById("settings-detail").innerHTML = `<div>need 2 datasources</div>`;
+                return
+              }
+            let nodeparentA = editor.getNodeFromId(node.inputs.input_1.connections[0].node);
+            joinBuild(node.id, node.data, nodeparentA.data, nodeparent.data);
+          break;
+        case "groupby":
+            // if parent node doesnt contain columns nok
+            if (typeof nodeparent.data.columns == "undefined" && nodeparent.data.columns == null) {
+              document.getElementById("settings-detail").innerHTML = `<div>no datasource columns</div>`;
+              return
+            }
+            groupbyBuild(node.id, node.data, nodeparent.data);
+          break;
+        case "aggregate":
+            // if parent node doesnt contain columns nok
+            if (typeof nodeparent.data.columns == "undefined" && nodeparent.data.columns == null) {
+              document.getElementById("settings-detail").innerHTML = `<div>no datasource columns</div>`;
+              return
+            }
+            if (nodeparent.name != "groupby") {
+              document.getElementById("settings-detail").innerHTML = `<div>parent must be groupby node</div>`;
+              return
+            }
+            aggregateBuild(node.id, node.data, nodeparent.data);
+          break;
+          case "havingand":
+            // if parent node doesnt contain columns nok
+            if (typeof nodeparent.data.columns == "undefined" && nodeparent.data.columns == null) {
+              document.getElementById("settings-detail").innerHTML = `<div>no datasource columns</div>`;
+              return
+            }
+            havingAndBuild(node.id, node.data, nodeparent.data);
+          break;
+        case "havingor":
+            // if parent node doesnt contain columns nok
+            if (typeof nodeparent.data.columns == "undefined" && nodeparent.data.columns == null) {
+              document.getElementById("settings-detail").innerHTML = `<div>no datasource columns</div>`;
+              return
+            }
+            havingOrBuild(node.id, node.data, nodeparent.data);
+          break; 
+        default:
+          break;
+      }
+      
+    })
+
+    editor.on('connectionRemoved', function(connection) {
+      console.log('Connection removed');
+      // console.log(connection);
+      document.getElementById("settings-detail").innerHTML = "";
+    })
+
+    editor.on('mouseMove', function(position) {
+      // console.log('Position mouse x:' + position.x + ' y:'+ position.y);
+    })
+
+    editor.on('nodeMoved', function(id) {
+      console.log("Node moved " + id);
+    })
+
+    editor.on('zoom', function(zoom) {
+      console.log('Zoom level ' + zoom);
+    })
+
+    editor.on('translate', function(position) {
+      console.log('Translate x:' + position.x + ' y:'+ position.y);
+    })
+
+    editor.on('addReroute', function(id) {
+      console.log("Reroute added " + id);
+    })
+
+    editor.on('removeReroute', function(id) {
+      console.log("Reroute removed " + id);
+    })
+
+    /* DRAG EVENT */
+
+    /* Mouse and Touch Actions */
+
+    var elements = document.getElementsByClassName('drag-drawflow');
+    for (var i = 0; i < elements.length; i++) {
+      elements[i].addEventListener('touchend', drop, false);
+      elements[i].addEventListener('touchmove', positionMobile, false);
+      elements[i].addEventListener('touchstart', drag, false );
+    }
+
+    var mobile_item_selec = '';
+    var mobile_last_move = null;
+   function positionMobile(ev) {
+     mobile_last_move = ev;
+   }
+
+   function allowDrop(ev) {
+      ev.preventDefault();
+    }
+
+    function drag(ev) {
+      if (ev.type === "touchstart") {
+        mobile_item_selec = ev.target.closest(".drag-drawflow").getAttribute('data-node');
+      } else {
+      ev.dataTransfer.setData("node", ev.target.getAttribute('data-node'));
+      }
+    }
+
+    function drop(ev) {
+      if (ev.type === "touchend") {
+        var parentdrawflow = document.elementFromPoint( mobile_last_move.touches[0].clientX, mobile_last_move.touches[0].clientY).closest("#drawflow");
+        if(parentdrawflow != null) {
+          addNodeToDrawFlow(mobile_item_selec, mobile_last_move.touches[0].clientX, mobile_last_move.touches[0].clientY);
+        }
+        mobile_item_selec = '';
+      } else {
+        ev.preventDefault();
+        var data = ev.dataTransfer.getData("node");
+        addNodeToDrawFlow(data, ev.clientX, ev.clientY);
+      }
+
+    }
+
+    function runCode(data) {
+
+        let endData = data.drawflow.Home.data;
+
+        let list = Object.values(endData);
+
+        // let newDataSendBuild = [];
+
+        let endObject = {};
+        endObject["#00#"] = [];
+        endObject["#01#"] = [];
+        endObject["#02#"] = [];
+        endObject["#03#"] = [];
+        endObject["#04#"] = [];
+        endObject["#05#"] = [];
+        endObject["#06#"] = [];
+        endObject["#08#"] = [];
+        endObject["#09#"] = [];
+        endObject["#10#"] = [];
+        endObject["#11#"] = [];
+        endObject["#12#"] = [];
+        endObject["#13#"] = [];
+
+        let subOject = {};
+        let subOject2 = {};
+
+        // console.log(list);
+
+
+        for (var i = 0; i < list.length; i++) {
+          // all[i].classList.remove('selected');
+          if (list[i].name == "datasource") {
+            console.log(list[i]);
+          }
+        }
+
+
+
+
+         // need to look for start then get outputs field to run through the list
+        list.forEach(function(element) {
+
+          // console.log("here");
+          // console.log(element);
+          // console.log(element.name);
+
+                
+                if (element.name == "start" || element.name == "end" || element.name == "datasource" || element.data.code == "#07#") {
+                  // console.log("got here");
+                  return
+                }
+
+          //       console.log("ended up here");
+
+                if (element.data.code == "#05#") {
+                  subOject[element.data.source] = [];
+                  // subOject[element.data.source].push(element.data);
+                } else if (element.data.code == "#09#") {
+                  subOject2[element.data.source] = [];
+                  // subOject2[element.data.source].push(element.data);
+                } else {
+                  endObject[element.data.code].push(element.data);
+                }
+
+        });
+
+        list.forEach(function(element) {
+                
+                if (element.data.code == "#05#") {
+                  subOject[element.data.source].push(element.data);
+                }
+                if (element.data.code == "#09#") {
+                  subOject2[element.data.source].push(element.data);
+                }
+        });
+
+        let subList = Object.values(subOject);
+        let subList2 = Object.values(subOject2);
+
+        subList.forEach(function(element) {
+            endObject["#05#"].push(element);
+        });
+
+        subList2.forEach(function(element) {
+            endObject["#09#"].push(element);
+        });
+
+        console.log(endObject);
+        // console.log(newDataSend);
+
+        function updater(data) {
+          console.log(data);
+        }
+
+        fetch('/datarun', {
+              method: 'post',
+                    headers: {
+                        "Content-type": 'application/json'
+                    },
+                    body: JSON.stringify(endObject)
+            })
+            .then(response => response.json())
+            .then(data => (data.response == "200") ? updater(data.data) : console.log('error', data.msg));
+
+    }
+
+    function addNodeToDrawFlow(name, pos_x, pos_y) {
+      if(editor.editor_mode === 'fixed') {
+        return false;
+      }
+      pos_x = pos_x * ( editor.precanvas.clientWidth / (editor.precanvas.clientWidth * editor.zoom)) - (editor.precanvas.getBoundingClientRect().x * ( editor.precanvas.clientWidth / (editor.precanvas.clientWidth * editor.zoom)));
+      pos_y = pos_y * ( editor.precanvas.clientHeight / (editor.precanvas.clientHeight * editor.zoom)) - (editor.precanvas.getBoundingClientRect().y * ( editor.precanvas.clientHeight / (editor.precanvas.clientHeight * editor.zoom)));
+
+      switch (name) {
+        case 'datasource':
+        var datasourcetemp = `
+        <div>
+          <div class="title-box"><i class="fas fa-database"></i> datasource</div>
+        </div>
+        `;
+          editor.addNode('datasource', 1,  1, pos_x, pos_y, 'datasource', {"code": 'SKIP'}, datasourcetemp );
+          break;
+      case 'dataget':
+        var datagettemp = `
+        <div>
+          <div class="title-box"><i class="fas fa-database"></i> dataget</div>
+        </div>
+        `;
+          editor.addNode('dataget', 1,  1, pos_x, pos_y, 'dataget', {"code": '#00#'}, datagettemp );
+          break;
+        case 'join':
+          var jointemp = `
+          <div>
+            <div class="title-box"><i class="far fa-object-group"></i> join</div>
+          </div>
+          `
+          editor.addNode('join', 1, 1, pos_x, pos_y, 'join', {"code": '#01#'}, jointemp );
+          break;
+        case 'mutateadd':
+          var mutateaddtemp = `
+          <div>
+            <div class="title-box"><i class="fas fa-exchange-alt"></i> mutateadd</div>
+          </div>
+          `;
+          editor.addNode('mutateadd', 1, 1, pos_x, pos_y, 'mutateadd', {"code": '#02#'}, mutateaddtemp );
+          break;
+        case 'mutatechange':
+          var mutatechangetemp = `
+          <div>
+            <div class="title-box"><i class="fas fa-exchange-alt"></i> mutatechange</div>
+          </div>
+          `;
+          editor.addNode('mutatechange', 1, 1, pos_x, pos_y, 'mutatechange', {"code": '#03#'}, mutatechangetemp );
+          break;
+        case 'filterand':
+          var filterandtemp = `
+          <div>
+            <div class="title-box"><i class="fas fa-filter"></i> FilterAnd</div>
+          </div>
+          `;
+          editor.addNode('filterand', 1, 1, pos_x, pos_y, 'filterand', {"code": '#04#'}, filterandtemp );
+          break;
+        case 'filteror':
+          var filterortemp = `
+          <div>
+            <div class="title-box"><i class="fas fa-filter"></i> FilterOr</div>
+          </div>
+          `;
+          editor.addNode('filteror', 1, 1, pos_x, pos_y, 'filteror', {"code": '#05#'}, filterortemp );
+          break;
+        case 'groupby':
+          var groupbytemp = `
+          <div>
+            <div class="title-box"><i class="fas fa-layer-group"></i> GroupBy </div>
+          </div>
+          `;
+          editor.addNode('groupby', 1, 1, pos_x, pos_y, 'groupby', {"code": '#06#'}, groupbytemp );
+          break;
+        case 'aggregate':
+            var aggregatemp = `
+            <div>
+              <div class="title-box"><i class="fas fa-calculator"></i> aggregate </div>
+            </div>
+            `;
+            editor.addNode('aggregate', 1, 1, pos_x, pos_y, 'aggregate', {"code": '#07#'}, aggregatemp );
+            break;
+          case 'havingand':
+            var havingandtemp = `
+            <div>
+              <div class="title-box"><i class="fas fa-filter"></i> havingand </div>
+            </div>
+            `;
+            editor.addNode('havingand', 1, 1, pos_x, pos_y, 'havingand', {"code": '#08#'}, havingandtemp );
+            break;
+          case 'havingor':
+            var havingortemp = `
+            <div>
+              <div class="title-box"><i class="fas fa-filter"></i> havingor </div>
+            </div>
+            `;
+            editor.addNode('havingor', 1, 1, pos_x, pos_y, 'havingor', {"code": '#09#'}, havingortemp );
+            break;
+          case 'select':
+            var selecttemp = `
+            <div>
+              <div class="title-box"><i class="fas fa-columns"></i> select </div>             
+            </div>
+            `;
+
+            editor.addNode('select', 1, 1, pos_x, pos_y, 'select', {"code": '#10#'}, selecttemp );
+            break;
+
+          case 'arrange':
+            var arrangetemp = `
+            <div>
+              <div class="title-box"><i class="fas fa-sort-amount-up-alt"></i> arrange</div>
+            </div>
+            `;
+            editor.addNode('arrange', 1, 1, pos_x, pos_y, 'arrange', {"code": '#11#'}, arrangetemp );
+            break;
+          case 'subset':
+            var subsettemp = `
+            <div>
+                <div class="title-box"><i class="fas fa-grip-lines"></i> subset</div>
+            </div>
+            `;
+            editor.addNode('subset', 1, 1, pos_x, pos_y, 'subset', {"code": '#12#'}, subsettemp );
+            break;
+          case 'rename':
+            var renametemp = `
+            <div>
+                <div class="title-box"><i class="fas fa-signature"></i> rename</div>
+            </div>
+            `;
+            editor.addNode('rename', 1, 1, pos_x, pos_y, 'rename', {"code": '#13#'}, renametemp );
+            break;
+        case 'start':
+            var starttemp = `
+            <div>
+                <div class="title-box"><i class="fas fa-genderless"></i> start</div>
+            </div>
+            `;
+            editor.addNode('start', 0, 1, pos_x, pos_y, 'start', {"code": 'SKIP'}, starttemp );
+            break;
+        case 'end':
+            var endtemp = `
+            <div>
+                <div class="title-box"><i class="fas fa-genderless"></i> end</div>
+            </div>
+            `;
+            editor.addNode('end', 1, 0, pos_x, pos_y, 'end', {"code": 'SKIP'}, endtemp );
+            break;
+          case 'dbclick':
+            var dbclick = `
+            <div>
+            <div class="title-box"><i class="fas fa-mouse"></i> Db Click</div>
+              <div class="box dbclickbox" ondblclick="showpopup(event)">
+                Db Click here
+                <div class="modal" style="display:none">
+                  <div class="modal-content">
+                    <span class="close" onclick="closemodal(event)">&times;</span>
+                    Change your variable {name} !
+                    <input type="text" df-name>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+            `;
+            editor.addNode('dbclick', 1, 1, pos_x, pos_y, 'dbclick', { name: ''}, dbclick );
+            break;
+
+        default:
+      }
+    }
+
+  var transform = '';
+  function showpopup(e) {
+    e.target.closest(".drawflow-node").style.zIndex = "9999";
+    e.target.children[0].style.display = "block";
+    //document.getElementById("modalfix").style.display = "block";
+
+    //e.target.children[0].style.transform = 'translate('+translate.x+'px, '+translate.y+'px)';
+    transform = editor.precanvas.style.transform;
+    editor.precanvas.style.transform = '';
+    editor.precanvas.style.left = editor.canvas_x +'px';
+    editor.precanvas.style.top = editor.canvas_y +'px';
+    console.log(transform);
+
+    //e.target.children[0].style.top  =  -editor.canvas_y - editor.container.offsetTop +'px';
+    //e.target.children[0].style.left  =  -editor.canvas_x  - editor.container.offsetLeft +'px';
+    editor.editor_mode = "fixed";
+
+  }
+
+   function closemodal(e) {
+     e.target.closest(".drawflow-node").style.zIndex = "2";
+     e.target.parentElement.parentElement.style.display  ="none";
+     //document.getElementById("modalfix").style.display = "none";
+     editor.precanvas.style.transform = transform;
+       editor.precanvas.style.left = '0px';
+       editor.precanvas.style.top = '0px';
+      editor.editor_mode = "edit";
+   }
+
+    function changeModule(event) {
+      var all = document.querySelectorAll(".menu ul li");
+        for (var i = 0; i < all.length; i++) {
+          all[i].classList.remove('selected');
+        }
+      event.target.classList.add('selected');
+    }
+
+    function changeMode(option) {
+
+    //console.log(lock.id);
+      if(option == 'lock') {
+        lock.style.display = 'none';
+        unlock.style.display = 'block';
+      } else {
+        lock.style.display = 'block';
+        unlock.style.display = 'none';
+      }
+
+    }
+
+    function datasourceBuild(id, nodeData){
+
+      let inner = `<form>
+        <div class="row">
+          <div class="column">
+            <label for="ds-source">source</label>
+            <input class="u-full-width" type="text" id="ds-source" value="${(nodeData.source) ? nodeData.source : 'tester'}">
+            <label for="ds-dataconnection">Connection</label>
+            <select class="u-full-width" id="ds-dataconnection">
+                <option ${(nodeData.dataconnection == 'PS') ? 'selected' : ''} value="PS">PS</option>
+              </select>
+            <label for="ds-db-host">host</label>
+            <input class="u-full-width" type="text" id="ds-db-host" value="${(nodeData.dbhost) ? nodeData.dbhost : 'hh-pgsql-public.ebi.ac.uk'}">
+            <label for="ds-db-port">port</label>
+            <input class="u-full-width" type="text" id="ds-db-port" value="${(nodeData.dbport) ? nodeData.dbport : '5432'}">
+            <label for="ds-db-user">user</label>
+            <input class="u-full-width" type="text" id="ds-db-user" value="${(nodeData.dbuser) ? nodeData.dbuser : 'reader'}">
+            <label for="ds-db-password">password</label>
+            <input class="u-full-width" type="text" id="ds-db-password" value="${(nodeData.dbpassword) ? nodeData.dbpassword : 'NWDMCE5xdipIjRrp'}">
+            <label for="ds-db-database">database</label>
+            <input class="u-full-width" type="text" id="ds-db-database" value="${(nodeData.dbdatabase) ? nodeData.dbdatabase : 'pfmegrnargs'}">
+          </div>
+          </div>
+        </form>
+        <a class="button button-primary" id="ds-save" href="#">Save</a>
+        `;
+
+        document.getElementById("settings-detail").innerHTML = inner;
+
+        document.getElementById("ds-save").addEventListener("click", function (event) {
+            event.preventDefault();
+
+            var sendD = new Object();
+
+            sendD.source = document.getElementById("ds-source").value;
+            sendD.dataconnection = document.getElementById("ds-dataconnection").value;
+            sendD.dbhost = document.getElementById("ds-db-host").value;
+            sendD.dbport = document.getElementById("ds-db-port").value;
+            sendD.dbuser = document.getElementById("ds-db-user").value;
+            sendD.dbpassword = document.getElementById("ds-db-password").value;
+            sendD.dbdatabase = document.getElementById("ds-db-database").value;
+
+            function updater(cols) {
+
+              nodeData.source = document.getElementById("ds-source").value;
+              nodeData.dataconnection = document.getElementById("ds-dataconnection").value;
+              nodeData.dbhost = document.getElementById("ds-db-host").value;
+              nodeData.dbport = document.getElementById("ds-db-port").value;
+              nodeData.dbuser = document.getElementById("ds-db-user").value;
+              nodeData.dbpassword = document.getElementById("ds-db-password").value;
+              nodeData.dbdatabase = document.getElementById("ds-db-database").value;
+              nodeData.tables = cols.Tables;
+
+              editor.updateNodeDataFromId(id, nodeData);  
+            }
+
+
+            fetch('/gettables', {
+              method: 'post',
+                    headers: {
+                        "Content-type": 'application/json'
+                    },
+                    body: JSON.stringify(sendD)
+            })
+            .then(response => response.json())
+            .then(data => (data.response == "200") ? updater(data.data) : console.log('error', data.msg));
+
+        });
+
+    }
+
+    function datagetBuild(id, nodeData, parentData){
+
+        let inner = `<form>
+          <div class="row">
+            <div class="column">
+
+              <label for="dg-dataname">Data Name</label>
+            <input class="u-full-width" type="text" id="dg-dataname" value="${(nodeData.source) ? nodeData.source : 'tableA'}">
+
+              <label for="dg-table">Data Table</label>
+              <select class="u-full-width" id="dg-table">
+                <option ${(nodeData.table == 'CUSTOM') ? 'selected' : ''} value="CUSTOM">CUSTOM</option>
+              </select>
+
+              <label for="dg-sql">SQL</label>
+              <textarea class="u-full-width" id="dg-sql">${(nodeData.dbsql) ? nodeData.dbsql : 'SELECT * FROM xref LIMIT 5;'}</textarea>
+            </div>
+            </div>
+          </form>
+          <a class="button button-primary" id="dg-save" href="#">Save</a>
+          `;
+
+          document.getElementById("settings-detail").innerHTML = inner;
+
+          parentData.tables[0].forEach(function(element) {
+              var x = document.getElementById("dg-table");
+                var option = document.createElement("option");
+                option.text = element;
+                option.value = element;
+
+                if (element == nodeData.table) {
+                  option.selected = true;
+                }
+
+                x.add(option);
+            });
+
+          document.getElementById("dg-save").addEventListener("click", function (event) {
+              event.preventDefault();
+
+
+              // console.log("here");
+              // console.log(nodeData);
+
+              var sendD = new Object();
+
+              sendD.table = document.getElementById("dg-table").value;
+              sendD.dbsql = document.getElementById("dg-sql").value;
+
+              sendD.source = parentData.source + "." + document.getElementById("dg-dataname").value + "_" + id;
+              sendD.dataconnection = parentData.dataconnection;
+              sendD.dbhost = parentData.dbhost;
+              sendD.dbport = parentData.dbport;
+              sendD.dbuser = parentData.dbuser;
+              sendD.dbpassword = parentData.dbpassword;
+              sendD.dbdatabase = parentData.dbdatabase;
+
+              function updater(cols) {
+
+
+                nodeData.table = document.getElementById("dg-table").value;
+              nodeData.dbsql = document.getElementById("dg-sql").value;
+              
+              nodeData.source = parentData.source + "." + document.getElementById("dg-dataname").value + "_" + id;
+              nodeData.dataconnection = parentData.dataconnection;
+              nodeData.dbhost = parentData.dbhost;
+              nodeData.dbport = parentData.dbport;
+              nodeData.dbuser = parentData.dbuser;
+              nodeData.dbpassword = parentData.dbpassword;
+              nodeData.dbdatabase = parentData.dbdatabase;
+                nodeData.columns = cols.Columns;
+
+                editor.updateNodeDataFromId(id, nodeData);  
+              }
+
+
+              fetch('/getcolumns', {
+                method: 'post',
+                      headers: {
+                          "Content-type": 'application/json'
+                      },
+                      body: JSON.stringify(sendD)
+              })
+              .then(response => response.json())
+              .then(data => (data.response == "200") ? updater(data.data) : console.log('error', data.msg));
+
+          });
+
+        }
+
+    function filterAndBuild(id, nodeData, parentData){
+
+          let inner = `<form>
+            <div class="row">
+              <div class="column">
+                <label for="fa-column">Column</label>
+                <select class="u-full-width" id="fa-column">
+                </select>
+                <label for="fa-operator">Operator</label>
+                <select class="u-full-width" id="fa-operator">
+                  <option ${(nodeData.operator == 'Eq') ? 'selected' : ''} value="Eq">Eq</option>
+                  <option ${(nodeData.operator == 'Neq') ? 'selected' : ''} value="Neq">Neq</option>
+                  <option ${(nodeData.operator == 'Greater') ? 'selected' : ''} value="Greater">Greater</option>
+                  <option ${(nodeData.operator == 'GreaterEq') ? 'selected' : ''} value="GreaterEq">GreaterEq</option>
+                  <option ${(nodeData.operator == 'Less') ? 'selected' : ''} value="Less">Less</option>
+                  <option ${(nodeData.operator == 'LessEq') ? 'selected' : ''} value="LessEq">LessEq</option>
+                  <option ${(nodeData.operator == 'In') ? 'selected' : ''} value="In">In</option>
+                </select>
+
+                <label for="fa-value">Value</label>
+                <input class="u-full-width" type="text" id="fa-value" value="${(nodeData.value) ? nodeData.value : ''}">
+                
+              </div>
+              </div>
+            <div class="row"></div>
+            </form>
+            <a class="button button-primary" id="fa-save" href="#">Save</a>
+            `;
+
+            document.getElementById("settings-detail").innerHTML = inner;
+           
+            parentData.columns[0].forEach(function(element) {
+              var x = document.getElementById("fa-column");
+                var option = document.createElement("option");
+                option.text = element;
+                option.value = element;
+
+                if (element == nodeData.column) {
+                  option.selected = true;
+                }
+
+                x.add(option);
+            });
+
+            document.getElementById("fa-save").addEventListener("click", function (event) {
+                event.preventDefault();
+
+                nodeData.column = document.getElementById("fa-column").value;
+                nodeData.operator = document.getElementById("fa-operator").value;
+                nodeData.value = document.getElementById("fa-value").value;
+                nodeData.columns = parentData.columns;
+                nodeData.source = parentData.source;
+
+                editor.updateNodeDataFromId(id, nodeData);  
+            });
+
+          }
+
+    function filterOrBuild(id, nodeData, parentData){
+
+        let inner = `<form>
+          <div class="row">
+            <div class="column">
+              <label for="fo-column">Column</label>
+              <select class="u-full-width" id="fo-column">
+              </select>
+              <label for="fo-operator">Operator</label>
+              <select class="u-full-width" id="fo-operator">
+                <option ${(nodeData.operator == 'Eq') ? 'selected' : ''} value="Eq">Eq</option>
+                <option ${(nodeData.operator == 'Neq') ? 'selected' : ''} value="Neq">Neq</option>
+                <option ${(nodeData.operator == 'Greater') ? 'selected' : ''} value="Greater">Greater</option>
+                <option ${(nodeData.operator == 'GreaterEq') ? 'selected' : ''} value="GreaterEq">GreaterEq</option>
+                <option ${(nodeData.operator == 'Less') ? 'selected' : ''} value="Less">Less</option>
+                <option ${(nodeData.operator == 'LessEq') ? 'selected' : ''} value="LessEq">LessEq</option>
+                <option ${(nodeData.operator == 'In') ? 'selected' : ''} value="In">In</option>
+              </select>
+
+              <label for="fo-value">Value</label>
+              <input class="u-full-width" type="text" id="fo-value" value="${(nodeData.value) ? nodeData.value : ''}">
+              
+            </div>
+            </div>
+          <div class="row"></div>
+          </form>
+          <a class="button button-primary" id="fo-save" href="#">Save</a>
+          `;
+
+          document.getElementById("settings-detail").innerHTML = inner;
+        
+          parentData.columns[0].forEach(function(element) {
+            var x = document.getElementById("fo-column");
+              var option = document.createElement("option");
+              option.text = element;
+              option.value = element;
+
+              if (element == nodeData.column) {
+                option.selected = true;
+              }
+
+              x.add(option);
+          });
+
+          document.getElementById("fo-save").addEventListener("click", function (event) {
+              event.preventDefault();
+
+              nodeData.column = document.getElementById("fo-column").value;
+              nodeData.operator = document.getElementById("fo-operator").value;
+              nodeData.value = document.getElementById("fo-value").value;
+              nodeData.columns = parentData.columns;
+              nodeData.source = parentData.source;
+
+              editor.updateNodeDataFromId(id, nodeData);  
+          });
+
+        }
+
+    function arrangeBuild(id, nodeData, parentData){
+
+            let inner = `<form>
+                        <div class="row">
+                          <div class="column">
+                            <label for="ar-column">Column</label>
+                            <select class="u-full-width" id="ar-column">
+                            </select>
+                            <label for="ar-direction">direction</label>
+                          <select class="u-full-width" id="ar-direction">
+                            <option ${(nodeData.direction == 'ASC') ? 'selected' : ''} value="ASC">ASC</option>
+                            <option ${(nodeData.direction == 'DESC') ? 'selected' : ''} value="DESC">DESC</option>
+                          </select>
+                          </div>
+                          </div>
+                        </form>
+                        <a class="button button-primary" id="ar-save" href="#">Save</a>
+                        `;
+
+              document.getElementById("settings-detail").innerHTML = inner;
+
+              parentData.columns[0].forEach(function(element) {
+              var x = document.getElementById("ar-column");
+                var option = document.createElement("option");
+                option.text = element;
+                option.value = element;
+
+                if (element == nodeData.column) {
+                  option.selected = true;
+                }
+
+                x.add(option);
+            });
+
+
+              document.getElementById("ar-save").addEventListener("click", function (event) {
+                  event.preventDefault();
+
+                  nodeData.column = document.getElementById("ar-column").value;
+                  nodeData.direction = document.getElementById("ar-direction").value;
+                  nodeData.columns = parentData.columns;
+                  nodeData.source = parentData.source;
+
+                  editor.updateNodeDataFromId(id, nodeData);  
+              });
+
+            }
+
+    function subsetBuild(id, nodeData, parentData){
+
+      let inner = `<form>
+                  <div class="row">
+                    <div class="column">
+                      <label for="ss-direction">Column</label>
+                      <select class="u-full-width" id="ss-direction">
+                      <option ${(nodeData.direction == 'First') ? 'selected' : ''} value="First">First</option>
+                      <option ${(nodeData.direction == 'Last') ? 'selected' : ''} value="Last">Last</option>
+                    </select>
+                    <label for="ss-value">Value</label>
+                    <input class="u-full-width" type="number" id="ss-value" value="${(nodeData.value) ? nodeData.value : ''}">
+                    </div>
+                    </div>
+                  </form>
+                  <a class="button button-primary" id="ss-save" href="#">Save</a>
+                  `;
+
+        document.getElementById("settings-detail").innerHTML = inner;
+
+
+        document.getElementById("ss-save").addEventListener("click", function (event) {
+            event.preventDefault();
+            
+            nodeData.direction = document.getElementById("ss-direction").value;
+            nodeData.value = document.getElementById("ss-value").value;
+            nodeData.columns = parentData.columns;
+            nodeData.source = parentData.source;
+
+            editor.updateNodeDataFromId(id, nodeData);  
+        });
+
+      }
+
+    function renameBuild(id, nodeData, parentData){
+
+      let inner = `<form>
+                  <div class="row">
+                    <div class="column">
+                      <label for="rn-column">Column</label>
+                      <select class="u-full-width" id="rn-column">
+                      </select>
+                      <label for="rn-value">Value</label>
+                      <input class="u-full-width" type="text" id="rn-value" value="${(nodeData.value) ? nodeData.value : ''}">
+                    </div>
+                    </div>
+                  </form>
+                  <a class="button button-primary" id="rn-save" href="#">Save</a>
+                  `;
+
+        document.getElementById("settings-detail").innerHTML = inner;
+
+        parentData.columns[0].forEach(function(element) {
+        var x = document.getElementById("rn-column");
+          var option = document.createElement("option");
+          option.text = element;
+          option.value = element;
+
+          if (element == nodeData.column) {
+            option.selected = true;
+          }
+
+          x.add(option);
+      });
+
+
+        document.getElementById("rn-save").addEventListener("click", function (event) {
+            event.preventDefault();
+
+            
+            nodeData.column = document.getElementById("rn-column").value;
+            nodeData.value = document.getElementById("rn-value").value;
+
+            let newColumns = [];
+            let endColumn = [];
+
+            parentData.columns[0].forEach(function(element) {
+                if (element == nodeData.column) {
+                  // newColumns.push(parentData.source + ":" + nodeData.value);
+                  newColumns.push(nodeData.value);
+                } else {
+                  newColumns.push(element);
+                }
+            });
+
+            endColumn.push(newColumns);
+
+            
+            nodeData.columns = endColumn;
+            nodeData.columnsorginal = parentData.columns;
+            nodeData.source = parentData.source;
+
+            editor.updateNodeDataFromId(id, nodeData);  
+        });
+
+      }
+
+    function selectBuild(id, nodeData, parentData){
+
+        let inner = `<form>
+                    <div class="row">
+                      <div class="column">
+                        <div id="mr-check-loop"></div>
+                      </div>
+                      </div>
+                    </form>
+                    <a class="button button-primary" id="mr-save" href="#">Save</a>
+                    `;
+
+          document.getElementById("settings-detail").innerHTML = inner;
+
+          parentData.columns[0].forEach(function(element) {
+              var x = document.getElementById("mr-check-loop");
+              var option = document.createElement("label");
+              
+              var inner = document.createElement("input");
+              inner.setAttribute("type", "checkbox");
+
+              if (typeof nodeData.columns == "undefined" && nodeData.columns == null) {
+                    inner.checked = true;
+                  } else {                  
+                    if (nodeData.columns[0].includes(element)) {
+                      inner.checked = true;
+                    } else {
+                      inner.checked = false;
+                    }
+                  }
+
+              inner.classList.add("mr");
+              inner.name = element;
+
+              var te = document.createElement("span");
+              te.innerText = element;
+              te.classList.add("label-body");
+
+              option.appendChild(inner);              
+              option.appendChild(te);              
+
+              x.appendChild(option);
+          });
+
+          document.getElementById("mr-save").addEventListener("click", function (event) {
+              event.preventDefault();
+              let selectedColumns = [];
+              // let keptColumns = [];
+
+              let endColumn = [];
+              let inputs = document.getElementsByClassName("mr");
+
+              for(var i = 0; i < inputs.length; i++) {
+                if(inputs[i].type == "checkbox") {
+
+                    if (inputs[i].checked == true) {
+                      selectedColumns.push(inputs[i].name);
+                    } 
+                    // else {
+                    //   keptColumns.push(inputs[i].name);
+                    // }
+
+                    
+                }  
+              }
+
+              endColumn.push(selectedColumns);
+
+              // nodeData.selectedcolumns = selectedColumns;
+              nodeData.columns = endColumn;
+              nodeData.columnsorginal = parentData.columns;
+              nodeData.source = parentData.source;
+
+              editor.updateNodeDataFromId(id, nodeData);  
+          });
+
+        }
+
+    function joinBuild(id, nodeData, parentDataA, parentDataB){
+
+      let inner = `<form>
+        <div class="row">
+          <div class="column">
+            <label for="jn-join">Join Type</label>
+            <select class="u-full-width" id="jn-join">
+              <option ${(nodeData.join == 'Inner') ? 'selected' : ''} value="Inner">Inner</option>
+              <option ${(nodeData.join == 'Left') ? 'selected' : ''} value="Left">Left</option>
+            </select>
+            <label for="jn-table-a" id="table-a-labal">table a</label>
+            <select class="u-full-width" id="jn-table-a">
+            </select>
+            <label for="jn-table-b" id="table-b-labal">table b</label>
+            <select class="u-full-width" id="jn-table-b">
+            </select>
+            
+          </div>
+          </div>
+        <div class="row"></div>
+        </form>
+        <a class="button button-primary" id="jn-save" href="#">Save</a>
+        `;
+
+        document.getElementById("settings-detail").innerHTML = inner;
+
+        document.getElementById("table-a-labal").innerText = "Table: " + parentDataA.source;
+      
+        parentDataA.columns[0].forEach(function(element) {
+          var x = document.getElementById("jn-table-a");
+            var option = document.createElement("option");
+            option.text = element;
+            option.value = element;
+
+            if (element == nodeData.columna) {
+              option.selected = true;
+            }
+
+            x.add(option);
+        });
+
+        document.getElementById("table-b-labal").innerText = "Table: " + parentDataB.source;
+
+        parentDataB.columns[0].forEach(function(element) {
+          var x = document.getElementById("jn-table-b");
+            var option = document.createElement("option");
+            option.text = element;
+            option.value = element;
+
+            if (element == nodeData.columnb) {
+              option.selected = true;
+            }
+
+            x.add(option);
+        });
+
+        document.getElementById("jn-save").addEventListener("click", function (event) {
+            event.preventDefault();
+
+            nodeData.columna = document.getElementById("jn-table-a").value;
+            nodeData.columnb = document.getElementById("jn-table-b").value;
+            nodeData.join = document.getElementById("jn-join").value;
+                      
+            let keptColumns = [];
+            let endColumn = [];
+
+            parentDataA.columns[0].forEach(function(element) {
+
+              // if (element == nodeData.columna) {
+              //   keptColumns.push(nodeData.columna + "_" + nodeData.columnb);
+              // } else {
+
+                if (parentDataB.columns[0].includes(element)) {
+                  // keptColumns.push(element + "_0");
+                  keptColumns.push(parentDataA.source + "_" + element);
+                } else {
+                  keptColumns.push(element);
+                }
+
+                
+              // }
+
+            });
+
+            parentDataB.columns[0].forEach(function(element) {
+
+              // if (element != nodeData.columnb) {
+
+                if (parentDataA.columns[0].includes(element)) {
+                  // keptColumns.push(element + "_1");
+                  keptColumns.push(parentDataB.source + "_" + element);
+                } else {
+                  keptColumns.push(element);
+                }
+
+                // keptColumns.push(element + "_1");
+              // }
+            });
+
+            endColumn.push(keptColumns);
+
+            nodeData.columns = endColumn;
+
+            nodeData.columnsorginala = parentDataA.columns;
+            nodeData.columnsorginalb = parentDataB.columns;
+            nodeData.sourcea = parentDataA.source;
+            nodeData.sourceb = parentDataB.source;
+            nodeData.source = parentDataA.source+ ":" + parentDataB.source;
+
+            editor.updateNodeDataFromId(id, nodeData);
+        });
+
+      }
+
+    function groupbyBuild(id, nodeData, parentData){
+
+          let inner = `<form>
+                      <div class="row">
+                        <div class="column">
+                          <div id="gp-check-loop"></div>
+                        </div>
+                        </div>
+                      </form>
+                      <a class="button button-primary" id="gp-save" href="#">Save</a>
+                      `;
+
+            document.getElementById("settings-detail").innerHTML = inner;
+
+            parentData.columns[0].forEach(function(element) {
+                var x = document.getElementById("gp-check-loop");
+                var option = document.createElement("label");
+                
+                var inner = document.createElement("input");
+                inner.setAttribute("type", "checkbox");
+
+                if (typeof nodeData.columns == "undefined" && nodeData.columns == null) {
+                  inner.checked = false;
+                } else {
+                  if (nodeData.columns[0].includes(element)) {
+                    inner.checked = true;
+                  } else {
+                    inner.checked = false;
+                  }
+                }
+
+                inner.classList.add("gp");
+                inner.name = element;
+
+                var te = document.createElement("span");
+                te.innerText = element;
+                te.classList.add("label-body");
+
+                option.appendChild(inner);              
+                option.appendChild(te);              
+
+                x.appendChild(option);
+            });
+
+            document.getElementById("gp-save").addEventListener("click", function (event) {
+                event.preventDefault();
+                let selectedColumns = [];
+                let endColumn = [];
+                let inputs = document.getElementsByClassName("gp");
+
+                for(var i = 0; i < inputs.length; i++) {
+                  if(inputs[i].type == "checkbox") {
+
+                      if (inputs[i].checked == true) {
+                        selectedColumns.push(inputs[i].name);
+                      } 
+                      
+                  }  
+                }
+
+                endColumn.push(selectedColumns);
+                nodeData.columns = endColumn;
+                nodeData.columnsorginal = parentData.columns;
+                nodeData.source = parentData.source;
+                nodeData.aggs = [];
+
+                editor.updateNodeDataFromId(id, nodeData);  
+            });
+
+          }
+
+    function aggregateBuild(id, nodeData, parentData, parentID, parentType){
+
+      let inner = `<form>
+                  <div class="row">
+                    <div class="column">
+                      <label for="ag-agtype">agtype</label>
+                        <select class="u-full-width" id="ag-agtype">
+                          <option ${(nodeData.agtype == 'MAX') ? 'selected' : ''} value="MAX">MAX</option>
+                          <option ${(nodeData.agtype == 'MEAN') ? 'selected' : ''} value="MEAN">MEAN</option>
+                          <option ${(nodeData.agtype == 'MEDIAN') ? 'selected' : ''} value="MEDIAN">MEDIAN</option>
+                          <option ${(nodeData.agtype == 'MIN') ? 'selected' : ''} value="MIN">MIN</option>
+                          <option ${(nodeData.agtype == 'STD') ? 'selected' : ''} value="STD">STD</option>
+                          <option ${(nodeData.agtype == 'SUM') ? 'selected' : ''} value="SUM">SUM</option>
+                          <option ${(nodeData.agtype == 'COUNT') ? 'selected' : ''} value="COUNT">COUNT</option>
+                        </select>
+                      <label for="ag-column">Column</label>
+                      <select class="u-full-width" id="ag-column">
+                      </select>
+                    </div>
+                    </div>
+                  </form>
+                  <a class="button button-primary" id="ag-save" href="#">Save</a>
+                  `;
+
+        document.getElementById("settings-detail").innerHTML = inner;
+
+        parentData.columnsorginal[0].forEach(function(element) {
+          var x = document.getElementById("ag-column");
+            var option = document.createElement("option");
+            option.text = element;
+            option.value = element;
+
+            if (element == nodeData.column) {
+              option.selected = true;
+            }
+
+            x.add(option);
+        });
+
+
+        document.getElementById("ag-save").addEventListener("click", function (event) {
+            event.preventDefault();
+
+            nodeData.column = document.getElementById("ag-column").value;
+            nodeData.agtype = document.getElementById("ag-agtype").value;
+            nodeData.columns = parentData.columns;
+            nodeData.columnsorginal = parentData.columnsorginal;
+            nodeData.source = parentData.source;
+
+            if (parentType == "groupby") {
+              nodeData.groupbyid = parentID;
+            } else {
+              nodeData.groupbyid = parentData.groupbyid;
+            }
+
+            nodeData.columns[0].push(nodeData.column+"_"+nodeData.agtype);
+            editor.updateNodeDataFromId(id, nodeData);
+
+
+            let nodeNew = editor.getNodeFromId(nodeData.groupbyid);
+            nodeNew.data.aggs.push(nodeData);
+            editor.updateNodeDataFromId(nodeNew.id, nodeNew.data);
+
+        });
+
+      }
+
+    function havingAndBuild(id, nodeData, parentData){
+
+          let inner = `<form>
+            <div class="row">
+              <div class="column">
+                <label for="ha-column">Column</label>
+                <select class="u-full-width" id="ha-column">
+                </select>
+                <label for="ha-operator">Operator</label>
+                <select class="u-full-width" id="ha-operator">
+                  <option ${(nodeData.operator == 'Eq') ? 'selected' : ''} value="Eq">Eq</option>
+                  <option ${(nodeData.operator == 'Neq') ? 'selected' : ''} value="Neq">Neq</option>
+                  <option ${(nodeData.operator == 'Greater') ? 'selected' : ''} value="Greater">Greater</option>
+                  <option ${(nodeData.operator == 'GreaterEq') ? 'selected' : ''} value="GreaterEq">GreaterEq</option>
+                  <option ${(nodeData.operator == 'Less') ? 'selected' : ''} value="Less">Less</option>
+                  <option ${(nodeData.operator == 'LessEq') ? 'selected' : ''} value="LessEq">LessEq</option>
+                  <option ${(nodeData.operator == 'In') ? 'selected' : ''} value="In">In</option>
+                </select>
+
+                <label for="ha-value">Value</label>
+                <input class="u-full-width" type="text" id="ha-value" value="${(nodeData.value) ? nodeData.value : ''}">
+                
+              </div>
+              </div>
+            <div class="row"></div>
+            </form>
+            <a class="button button-primary" id="ha-save" href="#">Save</a>
+            `;
+
+            document.getElementById("settings-detail").innerHTML = inner;
+          
+            parentData.columns[0].forEach(function(element) {
+              var x = document.getElementById("ha-column");
+                var option = document.createElement("option");
+                option.text = element;
+                option.value = element;
+
+                if (element == nodeData.column) {
+                  option.selected = true;
+                }
+
+                x.add(option);
+            });
+
+            document.getElementById("ha-save").addEventListener("click", function (event) {
+                event.preventDefault();
+
+                nodeData.column = document.getElementById("ha-column").value;
+                nodeData.operator = document.getElementById("ha-operator").value;
+                nodeData.value = document.getElementById("ha-value").value;
+                nodeData.columns = parentData.columns;
+                nodeData.source = parentData.source;
+
+                editor.updateNodeDataFromId(id, nodeData);  
+            });
+
+          }
+
+    function havingOrBuild(id, nodeData, parentData){
+
+            let inner = `<form>
+            <div class="row">
+              <div class="column">
+                <label for="ho-column">Column</label>
+                <select class="u-full-width" id="ho-column">
+                </select>
+                <label for="ho-operator">Operator</label>
+                <select class="u-full-width" id="ho-operator">SELECT *
+FROM xref
+LIMIT 5
+                  <option ${(nodeData.operator == 'Eq') ? 'selected' : ''} value="Eq">Eq</option>
+                  <option ${(nodeData.operator == 'Neq') ? 'selected' : ''} value="Neq">Neq</option>
+                  <option ${(nodeData.operator == 'Greater') ? 'selected' : ''} value="Greater">Greater</option>
+                  <option ${(nodeData.operator == 'GreaterEq') ? 'selected' : ''} value="GreaterEq">GreaterEq</option>
+                  <option ${(nodeData.operator == 'Less') ? 'selected' : ''} value="Less">Less</option>
+                  <option ${(nodeData.operator == 'LessEq') ? 'selected' : ''} value="LessEq">LessEq</option>
+                  <option ${(nodeData.operator == 'In') ? 'selected' : ''} value="In">In</option>
+                </select>
+
+                <label for="ho-value">Value</label>
+                <input class="u-full-width" type="text" id="ho-value" value="${(nodeData.value) ? nodeData.value : ''}">
+                
+              </div>
+              </div>
+            <div class="row"></div>
+            </form>
+            <a class="button button-primary" id="ho-save" href="#">Save</a>
+            `;
+
+    document.getElementById("settings-detail").innerHTML = inner;
+
+    parentData.columns[0].forEach(function(element) {
+      var x = document.getElementById("ho-column");
+        var option = document.createElement("option");
+        option.text = element;
+        option.value = element;
+
+        if (element == nodeData.column) {
+          option.selected = true;
+        }
+
+        x.add(option);
+    });
+
+    document.getElementById("ho-save").addEventListener("click", function (event) {
+        event.preventDefault();
+
+        nodeData.column = document.getElementById("ho-column").value;
+        nodeData.operator = document.getElementById("ho-operator").value;
+        nodeData.value = document.getElementById("ho-value").value;
+        nodeData.columns = parentData.columns;
+        nodeData.source = parentData.source;
+
+        editor.updateNodeDataFromId(id, nodeData);  
+    });
+
+    }
+
+  </script>
+</body>
+</html>
