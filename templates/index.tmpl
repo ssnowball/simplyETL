@@ -13,6 +13,8 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css" integrity="sha256-h20CPZ0QyXlBuAw7A+KluUYx/3pK+c7lYEpqLTlxjYQ=" crossorigin="anonymous" />
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
   <link href="https://unpkg.com/tabulator-tables/dist/css/tabulator.min.css" rel="stylesheet">
+
+  <link href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css" rel="stylesheet" type="text/css">
   
     <link rel="stylesheet" type="text/css" href="/assets/normalize.css">
     <link rel="stylesheet" type="text/css" href="/assets/skeleton.css">
@@ -45,23 +47,14 @@
       <div class="drag-drawflow" draggable="true" ondragstart="drag(event)" data-node="mutatechange">
         <i class="fas fa-exchange-alt"></i><span> MutateChange</span>
       </div> -->
-      <div class="drag-drawflow" draggable="true" ondragstart="drag(event)" data-node="filterand">
-        <i class="fas fa-filter"></i><span> FilterAnd</span>
-      </div>
-      <div class="drag-drawflow" draggable="true" ondragstart="drag(event)" data-node="filteror">
-        <i class="fas fa-filter"></i><span> FilterOr</span>
+      <div class="drag-drawflow" draggable="true" ondragstart="drag(event)" data-node="filterbuild">
+        <i class="fas fa-filter"></i><span> Filter</span>
       </div>
       <div class="drag-drawflow" draggable="true" ondragstart="drag(event)" data-node="groupby">
         <i class="fas fa-layer-group"></i><span> GroupBy</span>
       </div>
       <div class="drag-drawflow" draggable="true" ondragstart="drag(event)" data-node="aggregate">
         <i class="fas fa-calculator"></i><span> Aggregate</span>
-      </div>      
-      <div class="drag-drawflow" draggable="true" ondragstart="drag(event)" data-node="havingand">
-        <i class="fas fa-filter"></i><span> HavingAnd</span>
-      </div>
-      <div class="drag-drawflow" draggable="true" ondragstart="drag(event)" data-node="havingor">
-        <i class="fas fa-filter"></i><span> HavingOr</span>
       </div>
       <div class="drag-drawflow" draggable="true" ondragstart="drag(event)" data-node="select">
         <i class="fas fa-columns"></i><span> Select</span>
@@ -75,6 +68,9 @@
       <div class="drag-drawflow" draggable="true" ondragstart="drag(event)" data-node="rename">
         <i class="fas fa-signature"></i><span> Rename</span>
       </div>
+      <div class="drag-drawflow" draggable="true" ondragstart="drag(event)" data-node="output">
+        <i class="fas fa-filter"></i><span> Output</span>
+      </div>
       <div class="drag-drawflow" draggable="true" ondragstart="drag(event)" data-node="end">
         <i class="fas fa-genderless"></i><span> End</span>
       </div>
@@ -85,7 +81,7 @@
       <div id="drawflow" ondrop="drop(event)" ondragover="allowDrop(event)">
 
         <!-- <div class="btn-export" onclick="">Export</div> -->
-        <div class="btn-export" onclick="runCode(editor.export())">Export</div>
+        <div class="btn-export" onclick="runCode(editor.export())">Run</div>
         <!-- <div class="btn-export" onclick="Swal.fire({ title: 'Export', html: '<pre><code>'+JSON.stringify(editor.export(), null,4)+'</code></pre>'})">Export</div> -->
         <div class="btn-clear" onclick="editor.clearModuleSelected()">Clear</div>
         <div class="btn-lock">
@@ -120,12 +116,9 @@
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
   <script type="text/javascript" src="https://unpkg.com/micromodal/dist/micromodal.min.js"></script>
   <script type="text/javascript" src="https://unpkg.com/tabulator-tables/dist/js/tabulator.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/simple-datatables@latest" type="text/javascript"></script>
 
   <script>
-
-
-    // var DataColumns = [];
-
 
     var columnTable = new Tabulator("#column-table", {
         height:45, // set height of table (in CSS or here), this enables the Virtual DOM and improves render speed dramatically (can be any valid css height value)
@@ -219,7 +212,10 @@
 
             datagetBuild(node.id, node.data, nodeparent.data);
           break;
-        case "filterand":
+        case "filterbuild":
+
+              // console.log("here");
+
             if (node.inputs.input_1.connections.length != 1) {
                 document.getElementById("settings-detail").innerHTML = `<div>only 1 parent</div>`;
                 return
@@ -230,18 +226,6 @@
               return
             }
             filterAndBuild(node.id, node.data, nodeparent.data);
-          break;
-        case "filteror":
-        if (node.inputs.input_1.connections.length != 1) {
-                document.getElementById("settings-detail").innerHTML = `<div>only 1 parent</div>`;
-                return
-              }
-            // if parent node doesnt contain columns nok
-            if (typeof nodeparent.data.columns == "undefined" && nodeparent.data.columns == null) {
-              document.getElementById("settings-detail").innerHTML = `<div>no datasource columns</div>`;
-              return
-            }
-            filterOrBuild(node.id, node.data, nodeparent.data);
           break;
         case "select":
         if (node.inputs.input_1.connections.length != 1) {
@@ -285,7 +269,6 @@
                 document.getElementById("settings-detail").innerHTML = `<div>only 1 parent</div>`;
                 return
               }
-
 
               // if parent node doesnt contain columns nok
               if (typeof nodeparent.data.columns == "undefined" && nodeparent.data.columns == null) {
@@ -352,30 +335,6 @@
 
             aggregateBuild(node.id, node.data, nodeparent.data, nodeparent.id, typer);
           break;
-          case "havingand":
-          if (node.inputs.input_1.connections.length != 1) {
-                document.getElementById("settings-detail").innerHTML = `<div>only 1 parent</div>`;
-                return
-              }
-            // if parent node doesnt contain columns nok
-            if (typeof nodeparent.data.columns == "undefined" && nodeparent.data.columns == null) {
-              document.getElementById("settings-detail").innerHTML = `<div>no datasource columns</div>`;
-              return
-            }
-            havingAndBuild(node.id, node.data, nodeparent.data);
-          break;
-        case "havingor":
-        if (node.inputs.input_1.connections.length != 1) {
-                document.getElementById("settings-detail").innerHTML = `<div>only 1 parent</div>`;
-                return
-              }
-            // if parent node doesnt contain columns nok
-            if (typeof nodeparent.data.columns == "undefined" && nodeparent.data.columns == null) {
-              document.getElementById("settings-detail").innerHTML = `<div>no datasource columns</div>`;
-              return
-            }
-            havingOrBuild(node.id, node.data, nodeparent.data);
-          break;     
         default:
           break;
       }
@@ -426,21 +385,13 @@
 
             datagetBuild(node.id, node.data, nodeparent.data);
           break;
-        case "filterand":
+        case "filterbuild":
             // if parent node doesnt contain columns nok
             if (typeof nodeparent.data.columns == "undefined" && nodeparent.data.columns == null) {
               document.getElementById("settings-detail").innerHTML = `<div>no datasource columns</div>`;
               return
             }
             filterAndBuild(node.id, node.data, nodeparent.data);
-          break;
-        case "filteror":
-            // if parent node doesnt contain columns nok
-            if (typeof nodeparent.data.columns == "undefined" && nodeparent.data.columns == null) {
-              document.getElementById("settings-detail").innerHTML = `<div>no datasource columns</div>`;
-              return
-            }
-            filterOrBuild(node.id, node.data, nodeparent.data);
           break;
         case "select":
             // if parent node doesnt contain columns nok
@@ -507,22 +458,6 @@
             }
             aggregateBuild(node.id, node.data, nodeparent.data);
           break;
-          case "havingand":
-            // if parent node doesnt contain columns nok
-            if (typeof nodeparent.data.columns == "undefined" && nodeparent.data.columns == null) {
-              document.getElementById("settings-detail").innerHTML = `<div>no datasource columns</div>`;
-              return
-            }
-            havingAndBuild(node.id, node.data, nodeparent.data);
-          break;
-        case "havingor":
-            // if parent node doesnt contain columns nok
-            if (typeof nodeparent.data.columns == "undefined" && nodeparent.data.columns == null) {
-              document.getElementById("settings-detail").innerHTML = `<div>no datasource columns</div>`;
-              return
-            }
-            havingOrBuild(node.id, node.data, nodeparent.data);
-          break; 
         default:
           break;
       }
@@ -606,112 +541,197 @@
     function runCode(data) {
 
         let endData = data.drawflow.Home.data;
-
         let list = Object.values(endData);
 
-        console.log("------------------------");
-        console.log(list);
-        console.log("------------------------");
+        // console.log("------------------------");
+        // console.log(list);
+        // console.log("------------------------");
 
         // // need to loop and re-loop until senquence is completed
-        // let firstCommand;
-        // let newDataSendBuild = [];
+        // join need to be the stopping point down a path
+        // source(has 2 outs A and B go down A first)->dataA->filter->joinAtoB (stops here as no b yet) [source, dataA, filter]
+        // dataB->filter->JoinAtoB (can now do join) [source, dataA, filter, dataB, filter, joinAtoB]
+        let startCommand;
+        // let joins = 0;
+        let joinBuild = 0;
+        let newDataSendBuild = [];
 
-        // // need to find start command
-        // for (var i = 0; i < list.length; i++) {
-        //   if (list[i].name == "start") {
-        //     console.log(list[i]);
-        //     firstCommand = list[i];
-        //   }
-        // }
+        // need to find start command
+        for (var i = 0; i < list.length; i++) {
+          if (list[i].name == "start") {
+            startCommand = list[i];
+          }
 
-        // console.log("firstCommand");
-        // console.log(firstCommand);
+          // if (list[i].name == "join") {
+          //   joins = joins + 1;
+          // }
 
-        // firstCommand.outputs.output_1.connections.forEach(function(element) {
-        //   console.log(element.node);
-        //   // get the next steps
+        }
+
+        // console.log(joins);
+
+        function recurse(node, filterorID) {
+
+
+              for (var i = 0; i < list.length; i++) {
+
+                if (list[i].id == node.id && list[i].data.code != "SKIP" )  {
+                  
+
+                  if (list[i].name != "filteror") {
+                    newDataSendBuild.push(list[i]);
+                  }
+
+                  // if (list[i].name == "filteror") {
+
+                  //   console.log("what to add in");
+                  //   console.log(filterorID);
+
+                  //   // newDataSendBuild.push(new Array());
+                  // }
+
+                }
+              }
+
+              console.log("recurvise");
+              // console.log(node);
+              // console.log(node.outputs.output_1.connections);
+
+              for(var i = 0, count = node.outputs.output_1.connections.length; i < count; i++) {
+
+                // console.log("connections");
+                // console.log(node.outputs.output_1.connections[i].node);
+
+                for (var i2 = 0; i2 < list.length; i2++) {
+
+                  // console.log("check to see RECUR add");
+                  // console.log(node.outputs.output_1.connections[i].node);
+                  // console.log("list ID");
+                  // console.log(list[i2].id);
+                  // console.log(list[i2].data.code);
+                  // console.log(list[i2].id == node.outputs.output_1.connections[i].node && list[i2].data.code != "SKIP");
+                  // console.log(list[i2].id == parseInt(node.outputs.output_1.connections[i].node) && list[i2].data.code != "SKIP");
+
+
+                  if (list[i2].id == parseInt(node.outputs.output_1.connections[i].node))  {
+                    // console.log("matched");
+                    // console.log(list[i2]);
+
+                    if (list[i2].name != "end") {
+
+                      if (list[i2].name != "join") {
+                        recurse(list[i2]);
+                      }
+
+                      // if (list[i2].name == "filteror") {
+
+                      //   console.log("filerOR");
+
+                      //   // if next node is filteror
+                      //   // get number of filteror nodes and create array for that length
+                      //   newDataSendBuild.push(new Array());
+                      //   let idder = newDataSendBuild.length-1;
+                      //   recurse(list[i2], idder);
+
+
+                      // }
+
+                      if (list[i2].name == "join") {
+
+                        // console.log("join bit");
+
+
+                        joinBuild = joinBuild + 1;
+
+                        // console.log("joinBuild");
+                        // console.log(joinBuild);
+
+                        if (joinBuild%2 == 0) {
+
+                          // console.log("2nd join in list");
+                          // console.log(list[i2]);
+
+                          recurse(list[i2]);
+                        }
+
+                      }
+
+
+                      
+                    }
+                  }
+                }
+
+                  
+              }
+          }
+
+          recurse(startCommand);
+
+        
+
+        console.log("BUILER--------------------");
+        console.log(newDataSendBuild);
+
+
+        // let endObject = {};
+        // endObject["#00#"] = [];
+        // endObject["#01#"] = [];
+        // endObject["#02#"] = [];
+        // endObject["#03#"] = [];
+        // endObject["#04#"] = [];
+        // endObject["#05#"] = [];
+        // endObject["#06#"] = [];
+        // endObject["#08#"] = [];
+        // endObject["#09#"] = [];
+        // endObject["#10#"] = [];
+        // endObject["#11#"] = [];
+        // endObject["#12#"] = [];
+        // endObject["#13#"] = [];
+
+        // let subOject = {};
+        // let subOject2 = {};
+
+
+        //  // need to look for start then get outputs field to run through the list
+        // list.forEach(function(element) {
+                
+        //         if (element.name == "start" || element.name == "end" || element.name == "datasource" || element.data.code == "#07#") {
+        //           return
+        //         }
+
+        //         if (element.data.code == "#05#") {
+        //           subOject[element.data.source] = [];
+        //         } else if (element.data.code == "#09#") {
+        //           subOject2[element.data.source] = [];
+        //         } else {
+        //           endObject[element.data.code].push(element.data);
+        //         }
+
         // });
 
-
-
-        // for (var i = 0; i < list.length; i++) {
-        //   // all[i].classList.remove('selected');
-        //   if (list[i].name == "start") {
-        //     console.log(list[i]);
-        //     newDataSendBuild.push(list[i])
-        //   }
-        // }
-
-
-
-        let endObject = {};
-        endObject["#00#"] = [];
-        endObject["#01#"] = [];
-        endObject["#02#"] = [];
-        endObject["#03#"] = [];
-        endObject["#04#"] = [];
-        endObject["#05#"] = [];
-        endObject["#06#"] = [];
-        endObject["#08#"] = [];
-        endObject["#09#"] = [];
-        endObject["#10#"] = [];
-        endObject["#11#"] = [];
-        endObject["#12#"] = [];
-        endObject["#13#"] = [];
-
-        let subOject = {};
-        let subOject2 = {};
-
-        // console.log(list);
-
-
-        // for (var i = 0; i < list.length; i++) {
-        //   // all[i].classList.remove('selected');
-        //   if (list[i].name == "datasource") {
-        //     console.log(list[i]);
-        //   }
-        // }
-
-         // need to look for start then get outputs field to run through the list
-        list.forEach(function(element) {
+        // list.forEach(function(element) {
                 
-                if (element.name == "start" || element.name == "end" || element.name == "datasource" || element.data.code == "#07#") {
-                  return
-                }
+        //         if (element.data.code == "#05#") {
+        //           subOject[element.data.source].push(element.data);
+        //         }
+        //         if (element.data.code == "#09#") {
+        //           subOject2[element.data.source].push(element.data);
+        //         }
+        // });
 
-                if (element.data.code == "#05#") {
-                  subOject[element.data.source] = [];
-                } else if (element.data.code == "#09#") {
-                  subOject2[element.data.source] = [];
-                } else {
-                  endObject[element.data.code].push(element.data);
-                }
+        // let subList = Object.values(subOject);
+        // let subList2 = Object.values(subOject2);
 
-        });
+        // subList.forEach(function(element) {
+        //     endObject["#05#"].push(element);
+        // });
 
-        list.forEach(function(element) {
-                
-                if (element.data.code == "#05#") {
-                  subOject[element.data.source].push(element.data);
-                }
-                if (element.data.code == "#09#") {
-                  subOject2[element.data.source].push(element.data);
-                }
-        });
+        // subList2.forEach(function(element) {
+        //     endObject["#09#"].push(element);
+        // });
 
-        let subList = Object.values(subOject);
-        let subList2 = Object.values(subOject2);
-
-        subList.forEach(function(element) {
-            endObject["#05#"].push(element);
-        });
-
-        subList2.forEach(function(element) {
-            endObject["#09#"].push(element);
-        });
-
-        console.log(endObject);
+        // console.log(endObject);
         // console.log(newDataSend);
 
         function updater(data) {
@@ -723,7 +743,7 @@
                     headers: {
                         "Content-type": 'application/json'
                     },
-                    body: JSON.stringify(endObject)
+                    body: JSON.stringify(newDataSendBuild)
             })
             .then(response => response.json())
             .then(data => (data.response == "200") ? updater(data.data) : console.log('error', data.msg));
@@ -778,21 +798,13 @@
           `;
           editor.addNode('mutatechange', 1, 1, pos_x, pos_y, 'mutatechange', {"code": '#03#'}, mutatechangetemp );
           break;
-        case 'filterand':
-          var filterandtemp = `
+        case 'filterbuild':
+          var filterbuildtemp = `
           <div>
-            <div class="title-box"><i class="fas fa-filter"></i> FilterAnd</div>
+            <div class="title-box"><i class="fas fa-filter"></i> Filter Build</div>
           </div>
           `;
-          editor.addNode('filterand', 1, 1, pos_x, pos_y, 'filterand', {"code": '#04#'}, filterandtemp );
-          break;
-        case 'filteror':
-          var filterortemp = `
-          <div>
-            <div class="title-box"><i class="fas fa-filter"></i> FilterOr</div>
-          </div>
-          `;
-          editor.addNode('filteror', 1, 1, pos_x, pos_y, 'filteror', {"code": '#05#'}, filterortemp );
+          editor.addNode('filterbuild', 1, 1, pos_x, pos_y, 'filterbuild', {"code": '#04#', "optionscount" : 1}, filterbuildtemp );
           break;
         case 'groupby':
           var groupbytemp = `
@@ -809,22 +821,6 @@
             </div>
             `;
             editor.addNode('aggregate', 1, 1, pos_x, pos_y, 'aggregate', {"code": '#07#'}, aggregatemp );
-            break;
-          case 'havingand':
-            var havingandtemp = `
-            <div>
-              <div class="title-box"><i class="fas fa-filter"></i> havingand </div>
-            </div>
-            `;
-            editor.addNode('havingand', 1, 1, pos_x, pos_y, 'havingand', {"code": '#08#'}, havingandtemp );
-            break;
-          case 'havingor':
-            var havingortemp = `
-            <div>
-              <div class="title-box"><i class="fas fa-filter"></i> havingor </div>
-            </div>
-            `;
-            editor.addNode('havingor', 1, 1, pos_x, pos_y, 'havingor', {"code": '#09#'}, havingortemp );
             break;
           case 'select':
             var selecttemp = `
@@ -1113,34 +1109,57 @@
 
     function filterAndBuild(id, nodeData, parentData){
 
+        // console.log(nodeData.optionscount);
+
           let inner = `<form>
             <div class="row">
               <div class="column">
+                <label for="fa-type">Type</label>
+                <select class="u-full-width" id="fa-type">
+                  <option selected value="And">And</option>
+                  <option value="Or">Or</option>
+                </select>
                 <label for="fa-column">Column</label>
                 <select class="u-full-width" id="fa-column">
                 </select>
                 <label for="fa-operator">Operator</label>
                 <select class="u-full-width" id="fa-operator">
-                  <option ${(nodeData.operator == 'Eq') ? 'selected' : ''} value="Eq">Eq</option>
-                  <option ${(nodeData.operator == 'Neq') ? 'selected' : ''} value="Neq">Neq</option>
-                  <option ${(nodeData.operator == 'Greater') ? 'selected' : ''} value="Greater">Greater</option>
-                  <option ${(nodeData.operator == 'GreaterEq') ? 'selected' : ''} value="GreaterEq">GreaterEq</option>
-                  <option ${(nodeData.operator == 'Less') ? 'selected' : ''} value="Less">Less</option>
-                  <option ${(nodeData.operator == 'LessEq') ? 'selected' : ''} value="LessEq">LessEq</option>
-                  <option ${(nodeData.operator == 'In') ? 'selected' : ''} value="In">In</option>
+                  <option value="Eq">Eq</option>
+                  <option value="Neq">Neq</option>
+                  <option value="Greater">Greater</option>
+                  <option value="GreaterEq">GreaterEq</option>
+                  <option value="Less">Less</option>
+                  <option value="LessEq">LessEq</option>
                 </select>
 
                 <label for="fa-value">Value</label>
-                <input class="u-full-width" type="text" id="fa-value" value="${(nodeData.value) ? nodeData.value : ''}">
+                <input class="u-full-width" type="text" id="fa-value">
                 
               </div>
               </div>
             <div class="row"></div>
             </form>
+            <input class="u-full-width" type="number" id="fa-optionscount" value="${(nodeData.optionscount) ? nodeData.optionscount : '1'}">
+            <div id="additionRows" hidden>
+              <a class="button button-primary" id="fa-add" href="#">Add</a>
+              <table id="filter-table"><thead>
+                <tr>
+                  <th>A</th>
+                  <th>B</th>
+                  <th>C</th>
+                </tr>
+              </thead><tbody></tbody></table>
+            </div>
+            
             <a class="button button-primary" id="fa-save" href="#">Save</a>
             `;
 
             document.getElementById("settings-detail").innerHTML = inner;
+
+            let dataTable = new simpleDatatables.DataTable("#filter-table", {
+                searchable: false,
+                fixedHeight: false,
+            });
            
             parentData.columns[0].forEach(function(element) {
               var x = document.getElementById("fa-column");
@@ -1155,77 +1174,85 @@
                 x.add(option);
             });
 
+
+            if (typeof nodeData.filters != 'undefined' ) {
+
+                if (nodeData.filters.length > 1) {
+                  document.getElementById("additionRows").hidden = false;
+
+                  for (var i = 0; i < nodeData.filters.length; i++) {
+
+                  dataTable.rows().add([
+                          nodeData.filters[0].column,
+                          nodeData.filters[0].operator,
+                          nodeData.filters[0].value
+                    ]);
+
+                    document.getElementById("fa-optionscount").value = dataTable.data.length;
+
+                  }
+
+                } else {
+                    document.getElementById("fa-column").value = nodeData.filters[0].column;
+                    document.getElementById("fa-operator").value = nodeData.filters[0].operator;
+                    document.getElementById("fa-value").value = nodeData.filters[0].value;
+                }
+              }
+
+            document.getElementById("fa-type").addEventListener("change", function (event) {
+              event.preventDefault();
+
+              if (event.target.options[event.target.selectedIndex].value == "Or") {
+                document.getElementById("additionRows").hidden = false;
+              } else {
+                document.getElementById("additionRows").hidden = true;
+              }
+
+            })
+
+            document.getElementById("fa-add").addEventListener("click", function (event) {
+                event.preventDefault();
+
+                  dataTable.rows().add([document.getElementById("fa-column").value,
+                      document.getElementById("fa-operator").value,
+                      document.getElementById("fa-value").value
+                  ]);
+
+                  document.getElementById("fa-optionscount").value = dataTable.data.length;
+
+
+            });
+
             document.getElementById("fa-save").addEventListener("click", function (event) {
                 event.preventDefault();
 
-                nodeData.column = document.getElementById("fa-column").value;
-                nodeData.operator = document.getElementById("fa-operator").value;
-                nodeData.value = document.getElementById("fa-value").value;
+                nodeData.filters = [];
+
+                if (document.getElementById("fa-type").options[document.getElementById("fa-type").selectedIndex].value == "Or") {
+                  for (var i = 0; i < dataTable.data.length; i++) {
+                    let d = [].slice.call(dataTable.data[i].cells).map(function(cell) { return cell.textContent;});
+                    let mapp = {
+                      "column": d[0],
+                      "operator" : d[1],
+                      "value": d[2]
+                    }
+                    nodeData.filters.push(mapp);
+                  }
+                } else {
+                  let mapp = {
+                      "column": document.getElementById("fa-column").value,
+                      "operator" : document.getElementById("fa-operator").value,
+                      "value": document.getElementById("fa-value").value
+                    }
+                    nodeData.filters.push(mapp);
+                }
+                
                 nodeData.columns = parentData.columns;
                 nodeData.source = parentData.source;
 
                 editor.updateNodeDataFromId(id, nodeData);  
             });
-
           }
-
-    function filterOrBuild(id, nodeData, parentData){
-
-        let inner = `<form>
-          <div class="row">
-            <div class="column">
-              <label for="fo-column">Column</label>
-              <select class="u-full-width" id="fo-column">
-              </select>
-              <label for="fo-operator">Operator</label>
-              <select class="u-full-width" id="fo-operator">
-                <option ${(nodeData.operator == 'Eq') ? 'selected' : ''} value="Eq">Eq</option>
-                <option ${(nodeData.operator == 'Neq') ? 'selected' : ''} value="Neq">Neq</option>
-                <option ${(nodeData.operator == 'Greater') ? 'selected' : ''} value="Greater">Greater</option>
-                <option ${(nodeData.operator == 'GreaterEq') ? 'selected' : ''} value="GreaterEq">GreaterEq</option>
-                <option ${(nodeData.operator == 'Less') ? 'selected' : ''} value="Less">Less</option>
-                <option ${(nodeData.operator == 'LessEq') ? 'selected' : ''} value="LessEq">LessEq</option>
-                <option ${(nodeData.operator == 'In') ? 'selected' : ''} value="In">In</option>
-              </select>
-
-              <label for="fo-value">Value</label>
-              <input class="u-full-width" type="text" id="fo-value" value="${(nodeData.value) ? nodeData.value : ''}">
-              
-            </div>
-            </div>
-          <div class="row"></div>
-          </form>
-          <a class="button button-primary" id="fo-save" href="#">Save</a>
-          `;
-
-          document.getElementById("settings-detail").innerHTML = inner;
-        
-          parentData.columns[0].forEach(function(element) {
-            var x = document.getElementById("fo-column");
-              var option = document.createElement("option");
-              option.text = element;
-              option.value = element;
-
-              if (element == nodeData.column) {
-                option.selected = true;
-              }
-
-              x.add(option);
-          });
-
-          document.getElementById("fo-save").addEventListener("click", function (event) {
-              event.preventDefault();
-
-              nodeData.column = document.getElementById("fo-column").value;
-              nodeData.operator = document.getElementById("fo-operator").value;
-              nodeData.value = document.getElementById("fo-value").value;
-              nodeData.columns = parentData.columns;
-              nodeData.source = parentData.source;
-
-              editor.updateNodeDataFromId(id, nodeData);  
-          });
-
-        }
 
     function arrangeBuild(id, nodeData, parentData){
 
@@ -1701,124 +1728,6 @@
         });
 
       }
-
-    function havingAndBuild(id, nodeData, parentData){
-
-          let inner = `<form>
-            <div class="row">
-              <div class="column">
-                <label for="ha-column">Column</label>
-                <select class="u-full-width" id="ha-column">
-                </select>
-                <label for="ha-operator">Operator</label>
-                <select class="u-full-width" id="ha-operator">
-                  <option ${(nodeData.operator == 'Eq') ? 'selected' : ''} value="Eq">Eq</option>
-                  <option ${(nodeData.operator == 'Neq') ? 'selected' : ''} value="Neq">Neq</option>
-                  <option ${(nodeData.operator == 'Greater') ? 'selected' : ''} value="Greater">Greater</option>
-                  <option ${(nodeData.operator == 'GreaterEq') ? 'selected' : ''} value="GreaterEq">GreaterEq</option>
-                  <option ${(nodeData.operator == 'Less') ? 'selected' : ''} value="Less">Less</option>
-                  <option ${(nodeData.operator == 'LessEq') ? 'selected' : ''} value="LessEq">LessEq</option>
-                  <option ${(nodeData.operator == 'In') ? 'selected' : ''} value="In">In</option>
-                </select>
-
-                <label for="ha-value">Value</label>
-                <input class="u-full-width" type="text" id="ha-value" value="${(nodeData.value) ? nodeData.value : ''}">
-                
-              </div>
-              </div>
-            <div class="row"></div>
-            </form>
-            <a class="button button-primary" id="ha-save" href="#">Save</a>
-            `;
-
-            document.getElementById("settings-detail").innerHTML = inner;
-          
-            parentData.columns[0].forEach(function(element) {
-              var x = document.getElementById("ha-column");
-                var option = document.createElement("option");
-                option.text = element;
-                option.value = element;
-
-                if (element == nodeData.column) {
-                  option.selected = true;
-                }
-
-                x.add(option);
-            });
-
-            document.getElementById("ha-save").addEventListener("click", function (event) {
-                event.preventDefault();
-
-                nodeData.column = document.getElementById("ha-column").value;
-                nodeData.operator = document.getElementById("ha-operator").value;
-                nodeData.value = document.getElementById("ha-value").value;
-                nodeData.columns = parentData.columns;
-                nodeData.source = parentData.source;
-
-                editor.updateNodeDataFromId(id, nodeData);  
-            });
-
-          }
-
-    function havingOrBuild(id, nodeData, parentData){
-
-            let inner = `<form>
-            <div class="row">
-              <div class="column">
-                <label for="ho-column">Column</label>
-                <select class="u-full-width" id="ho-column">
-                </select>
-                <label for="ho-operator">Operator</label>
-                <select class="u-full-width" id="ho-operator">SELECT *
-FROM xref
-LIMIT 5
-                  <option ${(nodeData.operator == 'Eq') ? 'selected' : ''} value="Eq">Eq</option>
-                  <option ${(nodeData.operator == 'Neq') ? 'selected' : ''} value="Neq">Neq</option>
-                  <option ${(nodeData.operator == 'Greater') ? 'selected' : ''} value="Greater">Greater</option>
-                  <option ${(nodeData.operator == 'GreaterEq') ? 'selected' : ''} value="GreaterEq">GreaterEq</option>
-                  <option ${(nodeData.operator == 'Less') ? 'selected' : ''} value="Less">Less</option>
-                  <option ${(nodeData.operator == 'LessEq') ? 'selected' : ''} value="LessEq">LessEq</option>
-                  <option ${(nodeData.operator == 'In') ? 'selected' : ''} value="In">In</option>
-                </select>
-
-                <label for="ho-value">Value</label>
-                <input class="u-full-width" type="text" id="ho-value" value="${(nodeData.value) ? nodeData.value : ''}">
-                
-              </div>
-              </div>
-            <div class="row"></div>
-            </form>
-            <a class="button button-primary" id="ho-save" href="#">Save</a>
-            `;
-
-    document.getElementById("settings-detail").innerHTML = inner;
-
-    parentData.columns[0].forEach(function(element) {
-      var x = document.getElementById("ho-column");
-        var option = document.createElement("option");
-        option.text = element;
-        option.value = element;
-
-        if (element == nodeData.column) {
-          option.selected = true;
-        }
-
-        x.add(option);
-    });
-
-    document.getElementById("ho-save").addEventListener("click", function (event) {
-        event.preventDefault();
-
-        nodeData.column = document.getElementById("ho-column").value;
-        nodeData.operator = document.getElementById("ho-operator").value;
-        nodeData.value = document.getElementById("ho-value").value;
-        nodeData.columns = parentData.columns;
-        nodeData.source = parentData.source;
-
-        editor.updateNodeDataFromId(id, nodeData);  
-    });
-
-    }
 
   </script>
 </body>

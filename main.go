@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"sort"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -143,37 +142,62 @@ func main() {
 
 	r.POST("/datarun", func(c *gin.Context) {
 
-		var entry map[string]interface{}
+		var entry []map[string]interface{}
 		if err := c.ShouldBindJSON(&entry); err != nil {
 			c.JSON(400, gin.H{"msg": err.Error(), "response": 400})
 			return
 		}
 
+		dbKV, err := badger.Open(badger.DefaultOptions("tmp/badger"))
+		if err != nil {
+			dbKV.Close()
+			c.JSON(400, gin.H{"msg": err.Error(), "response": 400})
+			return
+		}
+		// defer dbKV.Close()
+		dbKV.DropAll()
+		dbKV.Close()
+
+		// fmt.Println(entry)
+
+		for _, v := range entry {
+			// fmt.Printf("index: %v\n", i)
+			// fmt.Printf("value: %v\n", v["data"])
+			err := x.RunDataChange(v["data"])
+			// // fmt.Println(v)
+			if err != nil {
+				c.JSON(400, gin.H{"msg": err.Error(), "response": 400})
+				return
+			}
+		}
+
 		// var datasend columnSend
 
-		names := make([]string, 0, len(entry))
-		for name := range entry {
-			names = append(names, name)
-		}
+		// names := make([]string, 0, len(entry))
+		// for name := range entry {
+		// 	names = append(names, name)
+		// }
 
-		sort.Strings(names)
+		// sort.Strings(names)
 
-		for _, name := range names {
+		// for _, name := range names {
 
-			if len(entry[name].([]interface{})) < 1 {
-				continue
-			}
+		// 	if len(entry[name].([]interface{})) < 1 {
+		// 		continue
+		// 	}
 
-			for _, v := range entry[name].([]interface{}) {
-				err := x.RunDataChange(v)
-				if err != nil {
-					c.JSON(400, gin.H{"msg": err.Error(), "response": 400})
-					return
-				}
+		// 	for _, v := range entry[name].([]interface{}) {
+		// 		// err := x.RunDataChange(v)
+		// 		fmt.Println(v)
 
-			}
+		// 		if err != nil {
+		// 			c.JSON(400, gin.H{"msg": err.Error(), "response": 400})
+		// 			return
+		// 		}
 
-		}
+		// 	}
+
+		// }
 
 		f, err := os.Create("outFileName.csv")
 		if err != nil {
@@ -182,7 +206,7 @@ func main() {
 		}
 		defer f.Close()
 
-		dbKV, err := badger.Open(badger.DefaultOptions("tmp/badger"))
+		dbKV, err = badger.Open(badger.DefaultOptions("tmp/badger"))
 		if err != nil {
 			c.JSON(400, gin.H{"msg": err.Error(), "response": 400})
 			dbKV.Close()
@@ -250,7 +274,7 @@ func main() {
 		f.Close()
 
 		c.JSON(200, gin.H{
-			"data":     "Completed CSV build",
+			"data":     "Completed build",
 			"response": 200,
 		})
 

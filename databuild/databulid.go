@@ -179,6 +179,8 @@ func RunDataChange(command interface{}) (err error) {
 
 		case "#04#":
 
+			// fmt.Println(m)
+
 			dbKV, err := badger.Open(badger.DefaultOptions("tmp/badger"))
 			if err != nil {
 				dbKV.Close()
@@ -196,61 +198,118 @@ func RunDataChange(command interface{}) (err error) {
 					k := item.Key()
 					err := item.Value(func(v []byte) error {
 
-						if strings.Contains(string(v), m["source"].(string)) {
-							//matched db row
-							getColumns := strings.Split(string(v), "|")
+						keeper := false
 
-							for _, v2 := range getColumns {
-								getColumnName := strings.Split(v2, ";")
+						for i, v2 := range m["filters"].([]interface{}) {
+							fmt.Println(i)
+							fmt.Println(v2)
+							m2 := v2.(map[string]interface{})
 
-								if m["column"].(string) == getColumnName[1] {
+							if strings.Contains(string(v), m["source"].(string)) {
+								//matched db row
+								getColumns := strings.Split(string(v), "|")
 
-									keeper := false
+								for _, v3 := range getColumns {
+									getColumnName := strings.Split(v3, ";")
 
-									switch m["operator"].(string) {
-									case "Eq":
-										if getColumnName[2] == m["value"].(string) {
-											keeper = true
-										}
-									case "Neq":
-										if getColumnName[2] != m["value"].(string) {
-											keeper = true
-										}
-									case "Greater":
-										if getColumnName[2] > m["value"].(string) {
-											keeper = true
-										}
-									case "GreaterEq":
-										if getColumnName[2] >= m["value"].(string) {
-											keeper = true
-										}
-									case "Less":
-										if getColumnName[2] < m["value"].(string) {
-											keeper = true
-										}
-									case "LessEq":
-										if getColumnName[2] <= m["value"].(string) {
-											keeper = true
-										}
-									case "In":
-										// com = series.In
-										// extra work in needed!
-										// TODO: here
-									}
+									if m2["column"].(string) == getColumnName[1] {
 
-									if !keeper {
+										switch m2["operator"].(string) {
+										case "Eq":
+											if getColumnName[2] == m2["value"].(string) {
+												keeper = true
+											}
+										case "Neq":
+											if getColumnName[2] != m2["value"].(string) {
+												keeper = true
+											}
+										case "Greater":
+											if getColumnName[2] > m2["value"].(string) {
+												keeper = true
+											}
+										case "GreaterEq":
+											if getColumnName[2] >= m2["value"].(string) {
+												keeper = true
+											}
+										case "Less":
+											if getColumnName[2] < m2["value"].(string) {
+												keeper = true
+											}
+										case "LessEq":
+											if getColumnName[2] <= m2["value"].(string) {
+												keeper = true
+											}
+										}
 
-										err := txn.Delete([]byte(string(k)))
-										if err != nil {
-											return err
+										if !keeper {
+											err := txn.Delete([]byte(string(k)))
+											if err != nil {
+												return err
+											}
 										}
 
 									}
 
 								}
-
 							}
+
 						}
+
+						// if strings.Contains(string(v), m["source"].(string)) {
+						// 	//matched db row
+						// 	getColumns := strings.Split(string(v), "|")
+
+						// 	for _, v2 := range getColumns {
+						// 		getColumnName := strings.Split(v2, ";")
+
+						// 		if m["column"].(string) == getColumnName[1] {
+
+						// 			keeper := false
+
+						// 			switch m["operator"].(string) {
+						// 			case "Eq":
+						// 				if getColumnName[2] == m["value"].(string) {
+						// 					keeper = true
+						// 				}
+						// 			case "Neq":
+						// 				if getColumnName[2] != m["value"].(string) {
+						// 					keeper = true
+						// 				}
+						// 			case "Greater":
+						// 				if getColumnName[2] > m["value"].(string) {
+						// 					keeper = true
+						// 				}
+						// 			case "GreaterEq":
+						// 				if getColumnName[2] >= m["value"].(string) {
+						// 					keeper = true
+						// 				}
+						// 			case "Less":
+						// 				if getColumnName[2] < m["value"].(string) {
+						// 					keeper = true
+						// 				}
+						// 			case "LessEq":
+						// 				if getColumnName[2] <= m["value"].(string) {
+						// 					keeper = true
+						// 				}
+						// 			case "In":
+						// 				// com = series.In
+						// 				// extra work in needed!
+						// 				// TODO: here
+						// 			}
+
+						// 			if !keeper {
+
+						// 				err := txn.Delete([]byte(string(k)))
+						// 				if err != nil {
+						// 					return err
+						// 				}
+
+						// 			}
+
+						// 		}
+
+						// 	}
+						// }
 
 						return nil
 					})
@@ -1014,7 +1073,7 @@ func GetPSData(entry map[string]interface{}) error {
 		// log.Fatal(err)
 	}
 	defer dbKV.Close()
-	dbKV.DropAll()
+	// dbKV.DropAll()
 
 	// connect to database
 	// connection string
