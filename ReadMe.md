@@ -48,7 +48,7 @@ There are buttons to help you and to run your final command instructions
 ## TODO
 
 - [ ] Union
-- [ ] Rebuild command sequencer
+- [x] Rebuild command sequencer
 - [ ] right join / Cross join?
 - [ ] Mutation of columns
 - [ ] In filter
