@@ -46,4 +46,10 @@ There are buttons to help you and to run your final command instructions
     - only outputs to CSV file called `outFileName`
 
 ## TODO
-    - add here stuff
+
+- [ ] right join / Cross join?
+- [ ] Mutation of columns
+- [ ] In filter
+- [ ] Notie feedback
+- [ ] Other channels to output data - add command to list
+- [ ] Pivot data?
