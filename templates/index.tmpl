@@ -36,9 +36,9 @@
       <div class="drag-drawflow" draggable="true" ondragstart="drag(event)" data-node="join">
         <i class="far fa-object-group"></i><span> Join</span>
       </div>
-      <div class="drag-drawflow" draggable="true" ondragstart="drag(event)" data-node="union">
+      <!-- <div class="drag-drawflow" draggable="true" ondragstart="drag(event)" data-node="union">
         <i class="far fa-object-group"></i><span> Union</span>
-      </div>
+      </div> -->
       <!-- <div class="drag-drawflow" draggable="true" ondragstart="drag(event)" data-node="mutateadd">
         <i class="fas fa-exchange-alt"></i><span> MutateAdd</span>
       </div>
@@ -609,9 +609,9 @@
 
         let list = Object.values(endData);
 
-        // console.log("------------------------");
-        // console.log(list);
-        // console.log("------------------------");
+        console.log("------------------------");
+        console.log(list);
+        console.log("------------------------");
 
         // // need to loop and re-loop until senquence is completed
         // let firstCommand;
@@ -718,15 +718,15 @@
           console.log(data);
         }
 
-        // fetch('/datarun', {
-        //       method: 'post',
-        //             headers: {
-        //                 "Content-type": 'application/json'
-        //             },
-        //             body: JSON.stringify(endObject)
-        //     })
-        //     .then(response => response.json())
-        //     .then(data => (data.response == "200") ? updater(data.data) : console.log('error', data.msg));
+        fetch('/datarun', {
+              method: 'post',
+                    headers: {
+                        "Content-type": 'application/json'
+                    },
+                    body: JSON.stringify(endObject)
+            })
+            .then(response => response.json())
+            .then(data => (data.response == "200") ? updater(data.data) : console.log('error', data.msg));
 
     }
 
