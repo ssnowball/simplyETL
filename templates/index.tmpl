@@ -609,7 +609,41 @@
 
         let list = Object.values(endData);
 
+        // console.log("------------------------");
+        // console.log(list);
+        // console.log("------------------------");
+
+        // // need to loop and re-loop until senquence is completed
+        // let firstCommand;
         // let newDataSendBuild = [];
+
+        // // need to find start command
+        // for (var i = 0; i < list.length; i++) {
+        //   if (list[i].name == "start") {
+        //     console.log(list[i]);
+        //     firstCommand = list[i];
+        //   }
+        // }
+
+        // console.log("firstCommand");
+        // console.log(firstCommand);
+
+        // firstCommand.outputs.output_1.connections.forEach(function(element) {
+        //   console.log(element.node);
+        //   // get the next steps
+        // });
+
+
+
+        // for (var i = 0; i < list.length; i++) {
+        //   // all[i].classList.remove('selected');
+        //   if (list[i].name == "start") {
+        //     console.log(list[i]);
+        //     newDataSendBuild.push(list[i])
+        //   }
+        // }
+
+
 
         let endObject = {};
         endObject["#00#"] = [];
@@ -632,37 +666,24 @@
         // console.log(list);
 
 
-        for (var i = 0; i < list.length; i++) {
-          // all[i].classList.remove('selected');
-          if (list[i].name == "datasource") {
-            console.log(list[i]);
-          }
-        }
-
-
-
+        // for (var i = 0; i < list.length; i++) {
+        //   // all[i].classList.remove('selected');
+        //   if (list[i].name == "datasource") {
+        //     console.log(list[i]);
+        //   }
+        // }
 
          // need to look for start then get outputs field to run through the list
         list.forEach(function(element) {
-
-          // console.log("here");
-          // console.log(element);
-          // console.log(element.name);
-
                 
                 if (element.name == "start" || element.name == "end" || element.name == "datasource" || element.data.code == "#07#") {
-                  // console.log("got here");
                   return
                 }
 
-          //       console.log("ended up here");
-
                 if (element.data.code == "#05#") {
                   subOject[element.data.source] = [];
-                  // subOject[element.data.source].push(element.data);
                 } else if (element.data.code == "#09#") {
                   subOject2[element.data.source] = [];
-                  // subOject2[element.data.source].push(element.data);
                 } else {
                   endObject[element.data.code].push(element.data);
                 }
@@ -697,15 +718,15 @@
           console.log(data);
         }
 
-        fetch('/datarun', {
-              method: 'post',
-                    headers: {
-                        "Content-type": 'application/json'
-                    },
-                    body: JSON.stringify(endObject)
-            })
-            .then(response => response.json())
-            .then(data => (data.response == "200") ? updater(data.data) : console.log('error', data.msg));
+        // fetch('/datarun', {
+        //       method: 'post',
+        //             headers: {
+        //                 "Content-type": 'application/json'
+        //             },
+        //             body: JSON.stringify(endObject)
+        //     })
+        //     .then(response => response.json())
+        //     .then(data => (data.response == "200") ? updater(data.data) : console.log('error', data.msg));
 
     }
 

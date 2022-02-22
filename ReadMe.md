@@ -47,9 +47,12 @@ There are buttons to help you and to run your final command instructions
 
 ## TODO
 
+- [ ] Union
+- [ ] Rebuild command sequencer
 - [ ] right join / Cross join?
 - [ ] Mutation of columns
 - [ ] In filter
 - [ ] Notie feedback
 - [ ] Other channels to output data - add command to list
 - [ ] Pivot data?
+- [ ] More data connections
