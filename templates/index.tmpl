@@ -22,6 +22,15 @@
     <link rel="stylesheet" type="text/css" href="/assets/skeleton.css">
     <link rel="stylesheet" type="text/css" href="/assets/offside.css">
 
+    <!-- <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/base.min.css"
+    /> -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css"
+    />
+
     <link rel="stylesheet" href="/assets/style.css">
 
 </head>
@@ -191,6 +200,8 @@
   <script src="https://unpkg.com/notie"></script>
 
   <script type="text/javascript" src="/assets/offside.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
 
   <script>
 
@@ -451,116 +462,116 @@
 
     editor.on('connectionCreated', function(connection) {
       console.log('Connection created');
-      console.log(connection);
+      // console.log(connection);
 
 
-      let node = editor.getNodeFromId(connection.input_id);
-      let nodeparent = editor.getNodeFromId(connection.output_id);
+      // let node = editor.getNodeFromId(connection.input_id);
+      // let nodeparent = editor.getNodeFromId(connection.output_id);
 
-      if (node.name == "start" || node.name == "end") {
-          document.getElementById("settings-detail").innerHTML = `<div>`+ node.name +`</div>`;
-          return
-      }
+      // if (node.name == "start" || node.name == "end") {
+      //     document.getElementById("settings-detail").innerHTML = `<div>`+ node.name +`</div>`;
+      //     return
+      // }
 
-      if (node.inputs.input_1.connections.length == 0) {
-          document.getElementById("settings-detail").innerHTML = `<div>no connections</div>`;
-          return
-      }
-      document.getElementById("settings-detail").innerHTML = "";
+      // if (node.inputs.input_1.connections.length == 0) {
+      //     document.getElementById("settings-detail").innerHTML = `<div>no connections</div>`;
+      //     return
+      // }
+      // document.getElementById("settings-detail").innerHTML = "";
 
-      switch (node.name) {
-        case "datasource":
-            datasourceBuild(node.id, node.data);
-          break;
-        case "dataget":
-            if (typeof nodeparent.data.tables == "undefined" && nodeparent.data.tables == null) {
-                  document.getElementById("settings-detail").innerHTML = `<div>no datasource connected</div>`;
-                  return
-                }
+      // switch (node.name) {
+      //   case "datasource":
+      //       datasourceBuild(node.id, node.data);
+      //     break;
+      //   case "dataget":
+      //       if (typeof nodeparent.data.tables == "undefined" && nodeparent.data.tables == null) {
+      //             document.getElementById("settings-detail").innerHTML = `<div>no datasource connected</div>`;
+      //             return
+      //           }
 
-                if (nodeparent.name != "datasource") {
-                document.getElementById("settings-detail").innerHTML = `<div>parent must be datasource</div>`;
-                return
-              }
+      //           if (nodeparent.name != "datasource") {
+      //           document.getElementById("settings-detail").innerHTML = `<div>parent must be datasource</div>`;
+      //           return
+      //         }
 
-            datagetBuild(node.id, node.data, nodeparent.data);
-          break;
-        case "filterbuild":
-            // if parent node doesnt contain columns nok
-            if (typeof nodeparent.data.columns == "undefined" && nodeparent.data.columns == null) {
-              document.getElementById("settings-detail").innerHTML = `<div>no datasource columns</div>`;
-              return
-            }
-            filterAndBuild(node.id, node.data, nodeparent.data);
-          break;
-        case "select":
-            // if parent node doesnt contain columns nok
-            if (typeof nodeparent.data.columns == "undefined" && nodeparent.data.columns == null) {
-              document.getElementById("settings-detail").innerHTML = `<div>no datasource columns</div>`;
-              return
-            }
-            selectBuild(node.id, node.data, nodeparent.data);
-          break;
-        case "arrange":
-            // if parent node doesnt contain columns nok
-            if (typeof nodeparent.data.columns == "undefined" && nodeparent.data.columns == null) {
-              document.getElementById("settings-detail").innerHTML = `<div>no datasource columns</div>`;
-              return
-            }
-            arrangeBuild(node.id, node.data, nodeparent.data);
-          break;
-        case "subset":
-            // if parent node doesnt contain columns nok
-            if (typeof nodeparent.data.columns == "undefined" && nodeparent.data.columns == null) {
-              document.getElementById("settings-detail").innerHTML = `<div>no datasource columns</div>`;
-              return
-            }
-            subsetBuild(node.id, node.data, nodeparent.data);
-          break;
-        case "rename":
-            // if parent node doesnt contain columns nok
-            if (typeof nodeparent.data.columns == "undefined" && nodeparent.data.columns == null) {
-              document.getElementById("settings-detail").innerHTML = `<div>no datasource columns</div>`;
-              return
-            }
-            renameBuild(node.id, node.data, nodeparent.data);
-          break;
-        case "join":
-            // if parent node doesnt contain columns nok
-            if (typeof nodeparent.data.columns == "undefined" && nodeparent.data.columns == null) {
-              document.getElementById("settings-detail").innerHTML = `<div>no datasource columns</div>`;
-              return
-            }
-            if (node.inputs.input_1.connections.length != 2) {
-                document.getElementById("settings-detail").innerHTML = `<div>need 2 datasources</div>`;
-                return
-              }
-            let nodeparentA = editor.getNodeFromId(node.inputs.input_1.connections[0].node);
-            joinBuild(node.id, node.data, nodeparentA.data, nodeparent.data);
-          break;
-        case "groupby":
-            // if parent node doesnt contain columns nok
-            if (typeof nodeparent.data.columns == "undefined" && nodeparent.data.columns == null) {
-              document.getElementById("settings-detail").innerHTML = `<div>no datasource columns</div>`;
-              return
-            }
-            groupbyBuild(node.id, node.data, nodeparent.data);
-          break;
-        case "aggregate":
-            // if parent node doesnt contain columns nok
-            if (typeof nodeparent.data.columns == "undefined" && nodeparent.data.columns == null) {
-              document.getElementById("settings-detail").innerHTML = `<div>no datasource columns</div>`;
-              return
-            }
-            if (nodeparent.name != "groupby") {
-              document.getElementById("settings-detail").innerHTML = `<div>parent must be groupby node</div>`;
-              return
-            }
-            aggregateBuild(node.id, node.data, nodeparent.data);
-          break;
-        default:
-          break;
-      }
+      //       datagetBuild(node.id, node.data, nodeparent.data);
+      //     break;
+      //   case "filterbuild":
+      //       // if parent node doesnt contain columns nok
+      //       if (typeof nodeparent.data.columns == "undefined" && nodeparent.data.columns == null) {
+      //         document.getElementById("settings-detail").innerHTML = `<div>no datasource columns</div>`;
+      //         return
+      //       }
+      //       filterAndBuild(node.id, node.data, nodeparent.data);
+      //     break;
+      //   case "select":
+      //       // if parent node doesnt contain columns nok
+      //       if (typeof nodeparent.data.columns == "undefined" && nodeparent.data.columns == null) {
+      //         document.getElementById("settings-detail").innerHTML = `<div>no datasource columns</div>`;
+      //         return
+      //       }
+      //       selectBuild(node.id, node.data, nodeparent.data);
+      //     break;
+      //   case "arrange":
+      //       // if parent node doesnt contain columns nok
+      //       if (typeof nodeparent.data.columns == "undefined" && nodeparent.data.columns == null) {
+      //         document.getElementById("settings-detail").innerHTML = `<div>no datasource columns</div>`;
+      //         return
+      //       }
+      //       arrangeBuild(node.id, node.data, nodeparent.data);
+      //     break;
+      //   case "subset":
+      //       // if parent node doesnt contain columns nok
+      //       if (typeof nodeparent.data.columns == "undefined" && nodeparent.data.columns == null) {
+      //         document.getElementById("settings-detail").innerHTML = `<div>no datasource columns</div>`;
+      //         return
+      //       }
+      //       subsetBuild(node.id, node.data, nodeparent.data);
+      //     break;
+      //   case "rename":
+      //       // if parent node doesnt contain columns nok
+      //       if (typeof nodeparent.data.columns == "undefined" && nodeparent.data.columns == null) {
+      //         document.getElementById("settings-detail").innerHTML = `<div>no datasource columns</div>`;
+      //         return
+      //       }
+      //       renameBuild(node.id, node.data, nodeparent.data);
+      //     break;
+      //   case "join":
+      //       // if parent node doesnt contain columns nok
+      //       if (typeof nodeparent.data.columns == "undefined" && nodeparent.data.columns == null) {
+      //         document.getElementById("settings-detail").innerHTML = `<div>no datasource columns</div>`;
+      //         return
+      //       }
+      //       if (node.inputs.input_1.connections.length != 2) {
+      //           document.getElementById("settings-detail").innerHTML = `<div>need 2 datasources</div>`;
+      //           return
+      //         }
+      //       let nodeparentA = editor.getNodeFromId(node.inputs.input_1.connections[0].node);
+      //       joinBuild(node.id, node.data, nodeparentA.data, nodeparent.data);
+      //     break;
+      //   case "groupby":
+      //       // if parent node doesnt contain columns nok
+      //       if (typeof nodeparent.data.columns == "undefined" && nodeparent.data.columns == null) {
+      //         document.getElementById("settings-detail").innerHTML = `<div>no datasource columns</div>`;
+      //         return
+      //       }
+      //       groupbyBuild(node.id, node.data, nodeparent.data);
+      //     break;
+      //   case "aggregate":
+      //       // if parent node doesnt contain columns nok
+      //       if (typeof nodeparent.data.columns == "undefined" && nodeparent.data.columns == null) {
+      //         document.getElementById("settings-detail").innerHTML = `<div>no datasource columns</div>`;
+      //         return
+      //       }
+      //       if (nodeparent.name != "groupby") {
+      //         document.getElementById("settings-detail").innerHTML = `<div>parent must be groupby node</div>`;
+      //         return
+      //       }
+      //       aggregateBuild(node.id, node.data, nodeparent.data);
+      //     break;
+      //   default:
+      //     break;
+      // }
       
     })
 
@@ -1514,10 +1525,13 @@
                       </div>
                       </div>
                     </form>
+                    <div id= "js-choice"></div>
                     <a class="button button-primary" id="mr-save" href="#">Save</a>
                     `;
 
           document.getElementById("settings-detail").innerHTML = inner;
+
+          const element = document.querySelector('.js-choice');
 
           parentData.columns[0].forEach(function(element) {
               var x = document.getElementById("mr-check-loop");
