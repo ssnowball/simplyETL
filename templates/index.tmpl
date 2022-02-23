@@ -15,17 +15,79 @@
   <link href="https://unpkg.com/tabulator-tables/dist/css/tabulator.min.css" rel="stylesheet">
 
   <link href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css" rel="stylesheet" type="text/css">
+
+  <link rel="stylesheet" type="text/css" href="https://unpkg.com/notie/dist/notie.min.css">
   
     <link rel="stylesheet" type="text/css" href="/assets/normalize.css">
     <link rel="stylesheet" type="text/css" href="/assets/skeleton.css">
+    <link rel="stylesheet" type="text/css" href="/assets/offside.css">
 
     <link rel="stylesheet" href="/assets/style.css">
 
 </head>
-<body> 
+<body>
+  
+  
+    <nav id="my-menu">
+      <div class="col">  
+          <div class="drag-drawflow" draggable="true" ondragstart="drag(event)" data-node="start">
+              <i class="fas fa-genderless"></i><span> Start</span>
+          </div>
+        <div class="drag-drawflow" draggable="true" ondragstart="drag(event)" data-node="datasource">
+          <i class="fas fa-database"></i><span> Data Source</span>
+        </div>
+        <div class="drag-drawflow" draggable="true" ondragstart="drag(event)" data-node="dataget">
+          <i class="fas fa-database"></i><span> Data Get</span>
+        </div>
+        <div class="drag-drawflow" draggable="true" ondragstart="drag(event)" data-node="join">
+          <i class="far fa-object-group"></i><span> Join</span>
+        </div>
+        <!-- <div class="drag-drawflow" draggable="true" ondragstart="drag(event)" data-node="union">
+          <i class="far fa-object-group"></i><span> Union</span>
+        </div> -->
+        <!-- <div class="drag-drawflow" draggable="true" ondragstart="drag(event)" data-node="mutateadd">
+          <i class="fas fa-exchange-alt"></i><span> MutateAdd</span>
+        </div>
+        <div class="drag-drawflow" draggable="true" ondragstart="drag(event)" data-node="mutatechange">
+          <i class="fas fa-exchange-alt"></i><span> MutateChange</span>
+        </div> -->
+        <div class="drag-drawflow" draggable="true" ondragstart="drag(event)" data-node="filterbuild">
+          <i class="fas fa-filter"></i><span> Filter</span>
+        </div>
+        <div class="drag-drawflow" draggable="true" ondragstart="drag(event)" data-node="groupby">
+          <i class="fas fa-layer-group"></i><span> GroupBy</span>
+        </div>
+        <div class="drag-drawflow" draggable="true" ondragstart="drag(event)" data-node="aggregate">
+          <i class="fas fa-calculator"></i><span> Aggregate</span>
+        </div>
+        <div class="drag-drawflow" draggable="true" ondragstart="drag(event)" data-node="select">
+          <i class="fas fa-columns"></i><span> Select</span>
+        </div>
+        <div class="drag-drawflow" draggable="true" ondragstart="drag(event)" data-node="arrange">
+          <i class="fas fa-sort-amount-up-alt"></i><span> Arrange</span>
+        </div>
+        <div class="drag-drawflow" draggable="true" ondragstart="drag(event)" data-node="subset">
+          <i class="fas fa-grip-lines"></i><span> Subset</span>
+        </div>
+        <div class="drag-drawflow" draggable="true" ondragstart="drag(event)" data-node="rename">
+          <i class="fas fa-signature"></i><span> Rename</span>
+        </div>
+        <div class="drag-drawflow" draggable="true" ondragstart="drag(event)" data-node="output">
+          <i class="fas fa-filter"></i><span> Output</span>
+        </div>
+        <div class="drag-drawflow" draggable="true" ondragstart="drag(event)" data-node="end">
+          <i class="fas fa-genderless"></i><span> End</span>
+        </div>
+      </div>
+    </nav>
+
+    <div id="my-content-container">
 
   <div class="wrapper">
-    <div class="col">
+
+  
+    <!-- <div class="col">
+
         <div class="drag-drawflow" draggable="true" ondragstart="drag(event)" data-node="start">
             <i class="fas fa-genderless"></i><span> Start</span>
         </div>
@@ -38,15 +100,15 @@
       <div class="drag-drawflow" draggable="true" ondragstart="drag(event)" data-node="join">
         <i class="far fa-object-group"></i><span> Join</span>
       </div>
-      <!-- <div class="drag-drawflow" draggable="true" ondragstart="drag(event)" data-node="union">
+      <div class="drag-drawflow" draggable="true" ondragstart="drag(event)" data-node="union">
         <i class="far fa-object-group"></i><span> Union</span>
-      </div> -->
-      <!-- <div class="drag-drawflow" draggable="true" ondragstart="drag(event)" data-node="mutateadd">
+      </div>
+      <div class="drag-drawflow" draggable="true" ondragstart="drag(event)" data-node="mutateadd">
         <i class="fas fa-exchange-alt"></i><span> MutateAdd</span>
       </div>
       <div class="drag-drawflow" draggable="true" ondragstart="drag(event)" data-node="mutatechange">
         <i class="fas fa-exchange-alt"></i><span> MutateChange</span>
-      </div> -->
+      </div>
       <div class="drag-drawflow" draggable="true" ondragstart="drag(event)" data-node="filterbuild">
         <i class="fas fa-filter"></i><span> Filter</span>
       </div>
@@ -74,16 +136,21 @@
       <div class="drag-drawflow" draggable="true" ondragstart="drag(event)" data-node="end">
         <i class="fas fa-genderless"></i><span> End</span>
       </div>
-    </div>
+    </div> -->
     
-
+    <!-- <button type="button" id="my-button" class="float"><i class="fas fa-plus"></i></button> -->
       
       <div id="drawflow" ondrop="drop(event)" ondragover="allowDrop(event)">
 
+        
+        <div class="btn-add" id="my-button"><i id="lock" class="fas fa-plus"></i></div>
         <!-- <div class="btn-export" onclick="">Export</div> -->
         <div class="btn-export" onclick="runCode(editor.export())">Run</div>
         <!-- <div class="btn-export" onclick="Swal.fire({ title: 'Export', html: '<pre><code>'+JSON.stringify(editor.export(), null,4)+'</code></pre>'})">Export</div> -->
         <div class="btn-clear" onclick="editor.clearModuleSelected()">Clear</div>
+
+        <div class="btn-setting" id="my-button-settings">Settings</div>
+
         <div class="btn-lock">
           <i id="lock" class="fas fa-lock" onclick="editor.editor_mode='fixed'; changeMode('lock');"></i>
           <i id="unlock" class="fas fa-lock-open" onclick="editor.editor_mode='edit'; changeMode('unlock');" style="display:none;"></i>
@@ -96,29 +163,50 @@
       </div>
     <!-- </div> -->
 
-    <div class="col">
-      Settings
-      <div id="settings-detail"></div>
-    </div>
+
 
 </div>
 
-  <div class="row">
-    <div class="column">
-      DataSource Columns
-      <div id="column-table"></div>
-    </div>
+<div class="row">
+  <div class="column">
+    DataSource Columns
+    <div id="column-table"></div>
   </div>
+</div>
 
+</div>
+
+<div id="my-menu-right">
+  Settings
+  <div id="settings-detail"></div>
+</div>
 
   <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/jerosoler/Drawflow/dist/drawflow.min.js"></script>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/js/all.min.js" integrity="sha256-KzZiKy0DWYsnwMF+X1DvQngQ2/FxF7MF3Ff72XcpuPs=" crossorigin="anonymous"></script>
-  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
-  <script type="text/javascript" src="https://unpkg.com/micromodal/dist/micromodal.min.js"></script>
+  <!-- <script type="text/javascript" src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script> -->
+  <!-- <script type="text/javascript" src="https://unpkg.com/micromodal/dist/micromodal.min.js"></script> -->
   <script type="text/javascript" src="https://unpkg.com/tabulator-tables/dist/js/tabulator.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/simple-datatables@latest" type="text/javascript"></script>
 
+  <script src="https://unpkg.com/notie"></script>
+
+  <script type="text/javascript" src="/assets/offside.js"></script>
+
   <script>
+
+      var myOffsideLeft = offside( '#my-menu', {
+
+      slidingElementsSelector:'#my-content-container',
+      buttonsSelector: '#my-button',
+      slidingSide: 'left',
+      });
+
+      var myOffsideRight = offside( '#my-menu-right', {
+
+        slidingElementsSelector:'#my-content-container',
+        buttonsSelector: '#my-button-settings',
+         slidingSide: 'right',
+        });
 
     var columnTable = new Tabulator("#column-table", {
         height:45, // set height of table (in CSS or here), this enables the Virtual DOM and improves render speed dramatically (can be any valid css height value)
@@ -172,15 +260,27 @@
       console.log(node);
 
       if (node.name == "start" || node.name == "end") {
-          document.getElementById("settings-detail").innerHTML = `<div>`+ node.name +`</div>`;
+          // document.getElementById("settings-detail").innerHTML = `<div>`+ node.name +`</div>`;
           return
       }
 
       if (node.inputs.input_1.connections.length == 0) {
-          document.getElementById("settings-detail").innerHTML = `<div>no connections</div>`;
+          // document.getElementById("settings-detail").innerHTML = `<div>no connections</div>`;
+          notie.alert({ type: 'warning', text: 'no connections' })
           return
       }
-      document.getElementById("settings-detail").innerHTML = "";
+      // document.getElementById("settings-detail").innerHTML = "";
+
+      // Swal.fire({
+      //   title: 'Error!',
+      //   text: 'Do you want to continue',
+      //   icon: 'error',
+      //   confirmButtonText: 'Cool'
+      // })
+
+      // return
+
+      myOffsideRight.open();
 
 
       let nodeparent = editor.getNodeFromId(node.inputs.input_1.connections[0].node);
@@ -492,6 +592,12 @@
 
     editor.on('removeReroute', function(id) {
       console.log("Reroute removed " + id);
+    })
+
+    editor.on('nodeUnselected', function(id) {
+      // console.log("Reroute removed " + id);
+      myOffsideLeft.close();
+      myOffsideRight.close();
     })
 
     /* DRAG EVENT */
