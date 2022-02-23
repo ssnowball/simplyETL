@@ -49,7 +49,17 @@ There are buttons to help you and to run your final command instructions
 
 - [ ] Union
 - [x] Rebuild command sequencer
-- [ ] right join / Cross join?
+- [ ] Fix command functions after rebuild
+    - [x] Join
+    - [x] Select
+    - [x] Rename
+    - [x] Subset
+    - [x] Arrange
+    - [x] Filter
+    - [ ] GroupBy
+        - rebuild to 1 command to include aggeregate
+- [ ] Right join / Cross join?
+- [ ] Distinct
 - [ ] Mutation of columns
 - [ ] In filter
 - [ ] Notie feedback

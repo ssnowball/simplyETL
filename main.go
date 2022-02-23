@@ -160,44 +160,58 @@ func main() {
 
 		// fmt.Println(entry)
 
-		for _, v := range entry {
-			// fmt.Printf("index: %v\n", i)
-			// fmt.Printf("value: %v\n", v["data"])
+		for i, v := range entry {
+			fmt.Printf("index: %v -------------------------------\n", i)
+			fmt.Printf("value: %v\n", v["data"])
 			err := x.RunDataChange(v["data"])
-			// // fmt.Println(v)
+			fmt.Println("returned from command with:")
+			fmt.Println(err)
 			if err != nil {
 				c.JSON(400, gin.H{"msg": err.Error(), "response": 400})
 				return
 			}
+
+			dbKV, err := badger.Open(badger.DefaultOptions("tmp/badger"))
+			if err != nil {
+				// dbKV.Close()
+				c.JSON(400, gin.H{"msg": err.Error(), "response": 400})
+				return
+			}
+			// defer dbKV.Close()
+
+			err = dbKV.View(func(txn *badger.Txn) error {
+				opts := badger.DefaultIteratorOptions
+				opts.PrefetchSize = 10
+				it := txn.NewIterator(opts)
+				defer it.Close()
+				for it.Rewind(); it.Valid(); it.Next() {
+					item := it.Item()
+					k := item.Key()
+
+					fmt.Println("returned from command with:")
+
+					err := item.Value(func(v []byte) error {
+
+						fmt.Println("UPDATE AFTER COMMAND")
+						fmt.Printf("key=%s, value=%s\n", k, v)
+						return nil
+					})
+					if err != nil {
+						return err
+					}
+				}
+				fmt.Println("returned from command with:")
+				return nil
+			})
+			if err != nil {
+				// dbKV.Close()
+				c.JSON(400, gin.H{"msg": err.Error(), "response": 400})
+				return
+			}
+
+			dbKV.Close()
+
 		}
-
-		// var datasend columnSend
-
-		// names := make([]string, 0, len(entry))
-		// for name := range entry {
-		// 	names = append(names, name)
-		// }
-
-		// sort.Strings(names)
-
-		// for _, name := range names {
-
-		// 	if len(entry[name].([]interface{})) < 1 {
-		// 		continue
-		// 	}
-
-		// 	for _, v := range entry[name].([]interface{}) {
-		// 		// err := x.RunDataChange(v)
-		// 		fmt.Println(v)
-
-		// 		if err != nil {
-		// 			c.JSON(400, gin.H{"msg": err.Error(), "response": 400})
-		// 			return
-		// 		}
-
-		// 	}
-
-		// }
 
 		f, err := os.Create("outFileName.csv")
 		if err != nil {
@@ -223,9 +237,9 @@ func main() {
 			defer it.Close()
 			for it.Rewind(); it.Valid(); it.Next() {
 				item := it.Item()
-				// k := item.Key()
+				k := item.Key()
 				err := item.Value(func(v []byte) error {
-					// fmt.Printf("key=%s, value=%s\n", k, v)
+					fmt.Printf("key=%s, value=%s\n", k, v)
 					w := csv.NewWriter(f)
 					defer w.Flush()
 
@@ -238,8 +252,10 @@ func main() {
 						var rowHeaders []string
 
 						for _, v := range rowbase {
+							fmt.Println("OUPUT CHECK---------------")
+							fmt.Println(v)
 							valueStrip := strings.Split(v, ";")
-							rowHeaders = append(rowHeaders, valueStrip[1])
+							rowHeaders = append(rowHeaders, valueStrip[0])
 						}
 
 						if err := w.Write(rowHeaders); err != nil {
@@ -251,7 +267,7 @@ func main() {
 
 					for _, v := range rowbase {
 						valueStrip := strings.Split(v, ";")
-						row = append(row, valueStrip[2])
+						row = append(row, valueStrip[1])
 					}
 
 					if err := w.Write(row); err != nil {

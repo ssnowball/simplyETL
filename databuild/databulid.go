@@ -36,7 +36,14 @@ type EntryDataSource struct {
 	DBDatabase string `form:"dbdatabase" json:"dbdatabase" xml:"dbdatabase" binding:"required"`
 }
 
+type Mapper struct {
+	Key  []byte
+	Data []byte
+}
+
 var counter int
+
+// var dbKV *badger.DB
 
 func RunDataChange(command interface{}) (err error) {
 
@@ -66,7 +73,7 @@ func RunDataChange(command interface{}) (err error) {
 
 			dbKV, err := badger.Open(badger.DefaultOptions("tmp/badger"))
 			if err != nil {
-				dbKV.Close()
+				// dbKV.Close()
 				return err
 			}
 			defer dbKV.Close()
@@ -124,14 +131,41 @@ func RunDataChange(command interface{}) (err error) {
 
 							for _, v2 := range getColumns {
 								colData := strings.Split(v2, ";")
+								// headerData := strings.Split(colData[0], ".")
 
-								if colData[1] == m["columna"].(string) {
+								// fmt.Println("----------------------------------CHECK1")
+								// fmt.Println(colData)
+								// fmt.Println(colData[0])
+								// fmt.Println(m["columna"].(string))
+
+								headerSplit1 := strings.Split(colData[0], ".")
+
+								if headerSplit1[2] == m["columna"].(string) {
+									// if colData[1] == m["columna"].(string) {
+									// if strings.Contains(colData[0], m["columna"].(string)) {
 
 									for _, v3 := range tempTable {
-										if strings.Contains(string(v3), fmt.Sprintf("%v;%v", colData[1], colData[2])) {
+
+										// fmt.Println(i3)
+
+										// headerSplit := strings.Split(colData[0], ".")
+
+										fmt.Println("----------------------------------CHECK2")
+
+										// fmt.Println(colData)
+										// fmt.Println(string(v3))
+										// fmt.Println(headerSplit[0])
+										// fmt.Println(headerSplit[2])
+										// fmt.Println(headerSplit[3])
+										// fmt.Println(strings.Contains(string(v3), fmt.Sprintf("%v;%v", m["columnb"].(string), colData[1])))
+
+										// need 2nd table in string
+										if strings.Contains(string(v3), fmt.Sprintf("%v;%v", m["columnb"].(string), colData[1])) {
+											// if strings.Contains(string(v3), colData[0]) {
+											// if strings.Contains(string(v3), headerSplit[2]) {
 											matchedCouner++
 
-											e := badger.NewEntry([]byte(fmt.Sprintf("%v.%v", string(k), matchedCouner)), []byte(fmt.Sprintf("%v|%v", string(v), string(v3)))).WithTTL(time.Hour)
+											e := badger.NewEntry([]byte(fmt.Sprintf("%v.%02v", string(k), matchedCouner)), []byte(fmt.Sprintf("%v|%v|%v;%v-on-%v", string(v), string(v3), m["source"].(string), m["columna"].(string), m["columnb"].(string)))).WithTTL(time.Hour)
 											err = txn.SetEntry(e)
 											if err != nil {
 												return err
@@ -140,10 +174,23 @@ func RunDataChange(command interface{}) (err error) {
 									}
 
 									// type of join determines what gets deleted
+
 									switch m["join"].(string) {
 									case "Inner":
+
+										// fmt.Println("HERE--------------------")
+										// fmt.Println(matchedCouner)
+										// fmt.Println(string(k))
+
 										// delete row a if no match
-										if matchedCouner == 0 {
+										// if matchedCouner == 0 {
+										// 	err := txn.Delete([]byte(string(k)))
+										// 	if err != nil {
+										// 		return err
+										// 	}
+										// }
+
+										if matchedCouner > 0 {
 											err := txn.Delete([]byte(string(k)))
 											if err != nil {
 												return err
@@ -151,6 +198,7 @@ func RunDataChange(command interface{}) (err error) {
 										}
 
 									case "Left":
+										//TODO :: check if correct if
 										// delete old row on match to leave new row
 										if matchedCouner > 0 {
 											err := txn.Delete([]byte(string(k)))
@@ -158,6 +206,13 @@ func RunDataChange(command interface{}) (err error) {
 												return err
 											}
 										}
+
+										// if matchedCouner == 0 {
+										// 	err := txn.Delete([]byte(string(k)))
+										// 	if err != nil {
+										// 		return err
+										// 	}
+										// }
 									}
 
 								}
@@ -177,13 +232,19 @@ func RunDataChange(command interface{}) (err error) {
 				return err
 			}
 
+			// fmt.Println("got here")
+			// dbKV.Close()
+
+			return nil
+
 		case "#04#":
 
 			// fmt.Println(m)
+			fmt.Println("FILTER CHECK---------------------")
 
 			dbKV, err := badger.Open(badger.DefaultOptions("tmp/badger"))
 			if err != nil {
-				dbKV.Close()
+				// dbKV.Close()
 				return err
 			}
 			defer dbKV.Close()
@@ -205,38 +266,42 @@ func RunDataChange(command interface{}) (err error) {
 							fmt.Println(v2)
 							m2 := v2.(map[string]interface{})
 
-							if strings.Contains(string(v), m["source"].(string)) {
+							if strings.Contains(string(v), m2["column"].(string)) {
 								//matched db row
 								getColumns := strings.Split(string(v), "|")
 
 								for _, v3 := range getColumns {
+
+									fmt.Println("CHECK ! ---------------------")
+									fmt.Println(v3)
+
 									getColumnName := strings.Split(v3, ";")
 
-									if m2["column"].(string) == getColumnName[1] {
+									if m2["column"].(string) == getColumnName[0] {
 
 										switch m2["operator"].(string) {
 										case "Eq":
-											if getColumnName[2] == m2["value"].(string) {
+											if getColumnName[1] == m2["value"].(string) {
 												keeper = true
 											}
 										case "Neq":
-											if getColumnName[2] != m2["value"].(string) {
+											if getColumnName[1] != m2["value"].(string) {
 												keeper = true
 											}
 										case "Greater":
-											if getColumnName[2] > m2["value"].(string) {
+											if getColumnName[1] > m2["value"].(string) {
 												keeper = true
 											}
 										case "GreaterEq":
-											if getColumnName[2] >= m2["value"].(string) {
+											if getColumnName[1] >= m2["value"].(string) {
 												keeper = true
 											}
 										case "Less":
-											if getColumnName[2] < m2["value"].(string) {
+											if getColumnName[1] < m2["value"].(string) {
 												keeper = true
 											}
 										case "LessEq":
-											if getColumnName[2] <= m2["value"].(string) {
+											if getColumnName[1] <= m2["value"].(string) {
 												keeper = true
 											}
 										}
@@ -254,62 +319,6 @@ func RunDataChange(command interface{}) (err error) {
 							}
 
 						}
-
-						// if strings.Contains(string(v), m["source"].(string)) {
-						// 	//matched db row
-						// 	getColumns := strings.Split(string(v), "|")
-
-						// 	for _, v2 := range getColumns {
-						// 		getColumnName := strings.Split(v2, ";")
-
-						// 		if m["column"].(string) == getColumnName[1] {
-
-						// 			keeper := false
-
-						// 			switch m["operator"].(string) {
-						// 			case "Eq":
-						// 				if getColumnName[2] == m["value"].(string) {
-						// 					keeper = true
-						// 				}
-						// 			case "Neq":
-						// 				if getColumnName[2] != m["value"].(string) {
-						// 					keeper = true
-						// 				}
-						// 			case "Greater":
-						// 				if getColumnName[2] > m["value"].(string) {
-						// 					keeper = true
-						// 				}
-						// 			case "GreaterEq":
-						// 				if getColumnName[2] >= m["value"].(string) {
-						// 					keeper = true
-						// 				}
-						// 			case "Less":
-						// 				if getColumnName[2] < m["value"].(string) {
-						// 					keeper = true
-						// 				}
-						// 			case "LessEq":
-						// 				if getColumnName[2] <= m["value"].(string) {
-						// 					keeper = true
-						// 				}
-						// 			case "In":
-						// 				// com = series.In
-						// 				// extra work in needed!
-						// 				// TODO: here
-						// 			}
-
-						// 			if !keeper {
-
-						// 				err := txn.Delete([]byte(string(k)))
-						// 				if err != nil {
-						// 					return err
-						// 				}
-
-						// 			}
-
-						// 		}
-
-						// 	}
-						// }
 
 						return nil
 					})
@@ -337,7 +346,7 @@ func RunDataChange(command interface{}) (err error) {
 
 			dbKV, err := badger.Open(badger.DefaultOptions("tmp/badger"))
 			if err != nil {
-				dbKV.Close()
+				// dbKV.Close()
 				return err
 			}
 			defer dbKV.Close()
@@ -488,7 +497,7 @@ func RunDataChange(command interface{}) (err error) {
 		case "#08#":
 			dbKV, err := badger.Open(badger.DefaultOptions("tmp/badger"))
 			if err != nil {
-				dbKV.Close()
+				// dbKV.Close()
 				return err
 			}
 			defer dbKV.Close()
@@ -581,7 +590,7 @@ func RunDataChange(command interface{}) (err error) {
 
 			dbKV, err := badger.Open(badger.DefaultOptions("tmp/badger"))
 			if err != nil {
-				dbKV.Close()
+				// dbKV.Close()
 				return err
 			}
 			defer dbKV.Close()
@@ -603,9 +612,16 @@ func RunDataChange(command interface{}) (err error) {
 							getColumns := strings.Split(string(v), "|")
 
 							for _, v2 := range getColumns {
+
+								fmt.Println(v2)
+
 								getColumnName := strings.Split(v2, ";")
 
-								_, keepCol := colS[getColumnName[1]]
+								if getColumnName[0] == m["source"].(string) {
+									continue
+								}
+
+								_, keepCol := colS[getColumnName[0]]
 								if keepCol {
 									outputter = append(outputter, v2)
 								}
@@ -634,14 +650,17 @@ func RunDataChange(command interface{}) (err error) {
 
 		case "#11#":
 
+			// fmt.Println("ARRNGE CHECK--------------------------")
+
 			dbKV, err := badger.Open(badger.DefaultOptions("tmp/badger"))
 			if err != nil {
-				dbKV.Close()
+				// dbKV.Close()
 				return err
 			}
 			defer dbKV.Close()
 
-			tempTable := make(map[string][]byte)
+			// tempTable := make(map[string][]byte)
+			tempTable2 := make(map[string]Mapper)
 
 			err = dbKV.View(func(txn *badger.Txn) error {
 				opts := badger.DefaultIteratorOptions
@@ -650,9 +669,10 @@ func RunDataChange(command interface{}) (err error) {
 				defer it.Close()
 				for it.Rewind(); it.Valid(); it.Next() {
 					item := it.Item()
+					k := item.Key()
 					err := item.Value(func(v []byte) error {
 
-						if strings.Contains(string(v), m["source"].(string)) {
+						if strings.Contains(string(v), m["column"].(string)) {
 
 							getColumns := strings.Split(string(v), "|")
 							var index string
@@ -660,14 +680,18 @@ func RunDataChange(command interface{}) (err error) {
 							for _, v2 := range getColumns {
 								getColumnName := strings.Split(v2, ";")
 
-								if getColumnName[1] == m["column"].(string) {
-									index = getColumnName[2]
+								if getColumnName[0] == m["column"].(string) {
+									index = getColumnName[1]
 
 								}
 
 							}
 
-							tempTable[index] = v
+							// tempTable[index] = v
+							tempTable2[index] = Mapper{
+								Key:  k,
+								Data: v,
+							}
 
 						}
 
@@ -683,22 +707,60 @@ func RunDataChange(command interface{}) (err error) {
 				return err
 			}
 
-			keys := make([]string, 0, len(tempTable))
-			for k := range tempTable {
-				keys = append(keys, k)
+			// fmt.Println("CHECK1--------------------------------")
+			// fmt.Println(tempTable)
+			// fmt.Println("----------------------------------")
+			// fmt.Println(tempTable2)
+			// fmt.Println("----------------------------------")
+
+			// keys := make([]string, 0, len(tempTable))
+			// for k := range tempTable {
+			// 	keys = append(keys, k)
+			// }
+
+			keys2 := make([]string, 0, len(tempTable2))
+			for k := range tempTable2 {
+				keys2 = append(keys2, k)
 			}
 
 			switch m["direction"].(string) {
 			case "ASC":
-				sort.Strings(keys)
+				// sort.Strings(keys)
+				sort.Strings(keys2)
 			case "DESC":
-				sort.Sort(sort.Reverse(sort.StringSlice(keys)))
+				// sort.Sort(sort.Reverse(sort.StringSlice(keys)))
+				sort.Sort(sort.Reverse(sort.StringSlice(keys2)))
 			}
 
-			for i, k := range keys {
+			// switch m["direction"].(string) {
+			// case "ASC":
+			// 	sort.Strings(keys2)
+			// case "DESC":
+			// 	sort.Sort(sort.Reverse(sort.StringSlice(keys2)))
+			// }
+
+			for i, k := range keys2 {
 				err = dbKV.Update(func(txn *badger.Txn) error {
-					e := badger.NewEntry([]byte(fmt.Sprintf("%02v", i+1)), tempTable[k]).WithTTL(time.Hour)
+
+					// fmt.Println("LINE ITEM -----------------------")
+					// fmt.Println(string(k))
+					// // fmt.Println(fmt.Sprintf("%02v", i+1))
+					// // fmt.Println(string(tempTable[k]))
+					// fmt.Println(string(tempTable2[k].Key))
+
+					// e := badger.NewEntry([]byte(fmt.Sprintf("%02v", i+1)), tempTable[k]).WithTTL(time.Hour)
+					e := badger.NewEntry([]byte(fmt.Sprintf("%02v", i+1)), tempTable2[k].Data).WithTTL(time.Hour)
 					err := txn.SetEntry(e)
+					if err != nil {
+						return err
+					}
+
+					// err = txn.Delete([]byte(string(k)))
+					err = txn.Delete([]byte(tempTable2[k].Key))
+					if err != nil {
+						return err
+					}
+
 					return err
 				})
 				if err != nil {
@@ -711,7 +773,7 @@ func RunDataChange(command interface{}) (err error) {
 
 			dbKV, err := badger.Open(badger.DefaultOptions("tmp/badger"))
 			if err != nil {
-				dbKV.Close()
+				// dbKV.Close()
 				return err
 			}
 			defer dbKV.Close()
@@ -732,7 +794,8 @@ func RunDataChange(command interface{}) (err error) {
 				return err
 			}
 
-			rows := make(map[string]string)
+			// rows := make(map[string]string)
+			var rowsS []string
 
 			numRows, err := strconv.Atoi(m["value"].(string))
 			if err != nil {
@@ -742,16 +805,21 @@ func RunDataChange(command interface{}) (err error) {
 
 			if m["direction"].(string) == "First" {
 				for i := 0; i < numRows; i++ {
-					rows[fmt.Sprintf("%02v", i+1)] = fmt.Sprintf("%02v", i+1)
+					// rows[fmt.Sprintf("%02v", i+1)] = fmt.Sprintf("%02v", i+1)
+					rowsS = append(rowsS, fmt.Sprintf("%02v", i+1))
 				}
 			} else {
 				// need to reverse counter
 				lower := maxRows - numRows
 
 				for i := lower; i < maxRows; i++ {
-					rows[fmt.Sprintf("%02v", i+1)] = fmt.Sprintf("%02v", i+1)
+					// rows[fmt.Sprintf("%02v", i+1)] = fmt.Sprintf("%02v", i+1)
+					rowsS = append(rowsS, fmt.Sprintf("%02v", i+1))
 				}
 			}
+
+			// fmt.Println("here----------------------")
+			// fmt.Println(rows)
 
 			err = dbKV.Update(func(txn *badger.Txn) error {
 				opts := badger.DefaultIteratorOptions
@@ -762,14 +830,23 @@ func RunDataChange(command interface{}) (err error) {
 					item := it.Item()
 					k := item.Key()
 
-					_, keepCol := rows[string(k)]
+					keepCol := false
+
+					for _, v := range rowsS {
+
+						if strings.Contains(string(k), fmt.Sprintf("%v.", v)) {
+							keepCol = true
+						}
+
+					}
+
+					// _, keepCol := rows[string(k)]
 					if !keepCol {
 
 						err := txn.Delete([]byte(string(k)))
 						if err != nil {
 							return err
 						}
-
 					}
 
 				}
@@ -783,10 +860,12 @@ func RunDataChange(command interface{}) (err error) {
 
 			dbKV, err := badger.Open(badger.DefaultOptions("tmp/badger"))
 			if err != nil {
-				dbKV.Close()
+				// dbKV.Close()
 				return err
 			}
 			defer dbKV.Close()
+
+			// fmt.Println("RENAME -------------------- HERE")
 
 			err = dbKV.Update(func(txn *badger.Txn) error {
 				opts := badger.DefaultIteratorOptions
@@ -800,15 +879,31 @@ func RunDataChange(command interface{}) (err error) {
 
 					err := item.Value(func(v []byte) error {
 
-						if strings.Contains(string(v), m["source"].(string)) {
+						// fmt.Println("CHECK 1---------------------")
+						// fmt.Println(string(v))
+						// fmt.Println(m["source"].(string))
+						// fmt.Println(m["column"].(string))
+
+						if strings.Contains(string(v), m["column"].(string)) {
 							//matched db row
+
 							getColumns := strings.Split(string(v), "|")
+
+							// fmt.Println("columns")
+							// fmt.Println(getColumns)
 
 							for _, v2 := range getColumns {
 								getColumnName := strings.Split(v2, ";")
 
-								if getColumnName[1] == m["column"].(string) {
-									outputter = append(outputter, fmt.Sprintf("%v;%v;%v", getColumnName[0], m["value"].(string), getColumnName[2]))
+								// if getColumnName[1] == m["column"].(string) {
+								if getColumnName[0] == m["column"].(string) {
+									// fmt.Println("HERE-----------------------------")
+									// fmt.Println(getColumnName[0])
+									newName := strings.Split(getColumnName[0], ".")
+									newName[2] = m["value"].(string)
+
+									// outputter = append(outputter, fmt.Sprintf("%v;%v;%v", getColumnName[0], m["value"].(string), getColumnName[1]))
+									outputter = append(outputter, fmt.Sprintf("%v;%v", strings.Join(newName, "."), getColumnName[1]))
 								} else {
 									outputter = append(outputter, v2)
 								}
@@ -845,7 +940,7 @@ func RunDataChange(command interface{}) (err error) {
 
 			dbKV, err := badger.Open(badger.DefaultOptions("tmp/badger"))
 			if err != nil {
-				dbKV.Close()
+				// dbKV.Close()
 				return err
 			}
 			defer dbKV.Close()
@@ -937,7 +1032,7 @@ func RunDataChange(command interface{}) (err error) {
 
 			dbKV, err := badger.Open(badger.DefaultOptions("tmp/badger"))
 			if err != nil {
-				dbKV.Close()
+				// dbKV.Close()
 				return err
 			}
 			defer dbKV.Close()
@@ -1066,14 +1161,35 @@ func GetPSColumns(entry Entry) ([]string, error) {
 
 func GetPSData(entry map[string]interface{}) error {
 
+	// attemps := 3
+
+	// var dbKV *badger.DB
+
+	// for i := 0; i < attemps; i++ {
+
+	// 	fmt.Printf("attempt: %v ----------------------------\n", i)
+
+	// 	dbKV, err := badger.Open(badger.DefaultOptions("tmp/badger"))
+	// 	if err != nil {
+	// 		time.Sleep(1 * time.Second)
+	// 	} else {
+	// 		defer dbKV.Close()
+	// 		break
+
+	// 	}
+
+	// }
+
 	dbKV, err := badger.Open(badger.DefaultOptions("tmp/badger"))
 	if err != nil {
-		dbKV.Close()
+		// dbKV.Close()
+		fmt.Println(err)
 		return err
 		// log.Fatal(err)
 	}
 	defer dbKV.Close()
-	// dbKV.DropAll()
+
+	fmt.Println("here1")
 
 	// connect to database
 	// connection string
@@ -1134,9 +1250,9 @@ func GetPSData(entry map[string]interface{}) error {
 
 			if reflect.TypeOf(a) != nil {
 				if reflect.TypeOf(a).String() == "[]uint8" {
-					outputter = append(outputter, fmt.Sprintf("%v;%v;%v", entry["source"].(string), name, string(a.([]byte))))
+					outputter = append(outputter, fmt.Sprintf("%v.%v;%v", entry["source"].(string), name, string(a.([]byte))))
 				} else {
-					outputter = append(outputter, fmt.Sprintf("%v;%v;%v", entry["source"].(string), name, a))
+					outputter = append(outputter, fmt.Sprintf("%v.%v;%v", entry["source"].(string), name, a))
 				}
 			}
 
@@ -1153,8 +1269,14 @@ func GetPSData(entry map[string]interface{}) error {
 
 	}
 
+	dbKV.Close()
+
+	fmt.Println(dbKV)
+
 	rows.Close()
 	db.Close()
+
+	fmt.Println("here2")
 
 	return nil
 }

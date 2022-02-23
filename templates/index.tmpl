@@ -1551,7 +1551,7 @@
 
                 if (parentDataB.columns[0].includes(element)) {
                   // keptColumns.push(element + "_0");
-                  keptColumns.push(parentDataA.source + "_" + element);
+                  keptColumns.push(parentDataA.source + "." + element);
                 } else {
                   keptColumns.push(element);
                 }
@@ -1567,7 +1567,7 @@
 
                 if (parentDataA.columns[0].includes(element)) {
                   // keptColumns.push(element + "_1");
-                  keptColumns.push(parentDataB.source + "_" + element);
+                  keptColumns.push(parentDataB.source + "." + element);
                 } else {
                   keptColumns.push(element);
                 }
