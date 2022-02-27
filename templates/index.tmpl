@@ -66,9 +66,9 @@
         <div class="drag-drawflow" draggable="true" ondragstart="drag(event)" data-node="groupby">
           <i class="fas fa-layer-group"></i><span> GroupBy</span>
         </div>
-        <div class="drag-drawflow" draggable="true" ondragstart="drag(event)" data-node="aggregate">
+        <!-- <div class="drag-drawflow" draggable="true" ondragstart="drag(event)" data-node="aggregate">
           <i class="fas fa-calculator"></i><span> Aggregate</span>
-        </div>
+        </div> -->
         <div class="drag-drawflow" draggable="true" ondragstart="drag(event)" data-node="select">
           <i class="fas fa-columns"></i><span> Select</span>
         </div>
@@ -81,9 +81,9 @@
         <div class="drag-drawflow" draggable="true" ondragstart="drag(event)" data-node="rename">
           <i class="fas fa-signature"></i><span> Rename</span>
         </div>
-        <div class="drag-drawflow" draggable="true" ondragstart="drag(event)" data-node="output">
+        <!-- <div class="drag-drawflow" draggable="true" ondragstart="drag(event)" data-node="output">
           <i class="fas fa-filter"></i><span> Output</span>
-        </div>
+        </div> -->
         <div class="drag-drawflow" draggable="true" ondragstart="drag(event)" data-node="end">
           <i class="fas fa-genderless"></i><span> End</span>
         </div>
@@ -264,193 +264,193 @@
       document.getElementById("settings-detail").innerHTML = "";
     })
 
-    editor.on('nodeSelected', function(id) {
+    // editor.on('nodeSelected', function(id) {
 
-      let node = editor.getNodeFromId(id);
+    //   let node = editor.getNodeFromId(id);
 
-      console.log(node);
+    //   console.log(node);
 
-      if (node.name == "start" || node.name == "end") {
-          // document.getElementById("settings-detail").innerHTML = `<div>`+ node.name +`</div>`;
-          return
-      }
+    //   if (node.name == "start" || node.name == "end") {
+    //       // document.getElementById("settings-detail").innerHTML = `<div>`+ node.name +`</div>`;
+    //       return
+    //   }
 
-      if (node.inputs.input_1.connections.length == 0) {
-          // document.getElementById("settings-detail").innerHTML = `<div>no connections</div>`;
-          notie.alert({ type: 'warning', text: 'no connections' })
-          return
-      }
-      // document.getElementById("settings-detail").innerHTML = "";
+    //   if (node.inputs.input_1.connections.length == 0) {
+    //       // document.getElementById("settings-detail").innerHTML = `<div>no connections</div>`;
+    //       notie.alert({ type: 'warning', text: 'no connections' })
+    //       return
+    //   }
+    //   // document.getElementById("settings-detail").innerHTML = "";
 
-      // Swal.fire({
-      //   title: 'Error!',
-      //   text: 'Do you want to continue',
-      //   icon: 'error',
-      //   confirmButtonText: 'Cool'
-      // })
+    //   // Swal.fire({
+    //   //   title: 'Error!',
+    //   //   text: 'Do you want to continue',
+    //   //   icon: 'error',
+    //   //   confirmButtonText: 'Cool'
+    //   // })
 
-      // return
+    //   // return
+    //   myOffsideLeft.close();
+    //   myOffsideRight.open();
 
-      myOffsideRight.open();
 
+    //   let nodeparent = editor.getNodeFromId(node.inputs.input_1.connections[0].node);
 
-      let nodeparent = editor.getNodeFromId(node.inputs.input_1.connections[0].node);
+    //   if (typeof node.data.columns != "undefined" && node.data.columns != null) {
+    //           columnTable.setData(node.data.columns);
+    //       } else {
+    //           columnTable.setData([]);
+    //       }
 
-      if (typeof node.data.columns != "undefined" && node.data.columns != null) {
-              columnTable.setData(node.data.columns);
-          } else {
-              columnTable.setData([]);
-          }
+    //   switch (node.name) {
+    //     case "datasource":
+    //         datasourceBuild(node.id, node.data);
+    //       break;
+    //     case "dataget":
+    //     if (node.inputs.input_1.connections.length != 1) {
+    //             document.getElementById("settings-detail").innerHTML = `<div>only 1 parent</div>`;
+    //             return
+    //           }
+    //         // if parent node doesnt contain columns nok
+    //         if (typeof nodeparent.data.tables == "undefined" && nodeparent.data.tables == null) {
+    //           document.getElementById("settings-detail").innerHTML = `<div>no datasource connected</div>`;
+    //           return
+    //         }
+    //         if (nodeparent.name != "datasource") {
+    //             document.getElementById("settings-detail").innerHTML = `<div>parent must be datasource</div>`;
+    //             return
+    //           }
 
-      switch (node.name) {
-        case "datasource":
-            datasourceBuild(node.id, node.data);
-          break;
-        case "dataget":
-        if (node.inputs.input_1.connections.length != 1) {
-                document.getElementById("settings-detail").innerHTML = `<div>only 1 parent</div>`;
-                return
-              }
-            // if parent node doesnt contain columns nok
-            if (typeof nodeparent.data.tables == "undefined" && nodeparent.data.tables == null) {
-              document.getElementById("settings-detail").innerHTML = `<div>no datasource connected</div>`;
-              return
-            }
-            if (nodeparent.name != "datasource") {
-                document.getElementById("settings-detail").innerHTML = `<div>parent must be datasource</div>`;
-                return
-              }
+    //         datagetBuild(node.id, node.data, nodeparent.data);
+    //       break;
+    //     case "filterbuild":
 
-            datagetBuild(node.id, node.data, nodeparent.data);
-          break;
-        case "filterbuild":
+    //           // console.log("here");
 
-              // console.log("here");
+    //         if (node.inputs.input_1.connections.length != 1) {
+    //             document.getElementById("settings-detail").innerHTML = `<div>only 1 parent</div>`;
+    //             return
+    //           }
+    //         // if parent node doesnt contain columns nok
+    //         if (typeof nodeparent.data.columns == "undefined" && nodeparent.data.columns == null) {
+    //           document.getElementById("settings-detail").innerHTML = `<div>no datasource columns</div>`;
+    //           return
+    //         }
+    //         filterAndBuild(node.id, node.data, nodeparent.data);
+    //       break;
+    //     case "select":
+    //     if (node.inputs.input_1.connections.length != 1) {
+    //             document.getElementById("settings-detail").innerHTML = `<div>only 1 parent</div>`;
+    //             return
+    //           }
+    //           // if parent node doesnt contain columns nok
+    //           if (typeof nodeparent.data.columns == "undefined" && nodeparent.data.columns == null) {
+    //             document.getElementById("settings-detail").innerHTML = `<div>no datasource columns</div>`;
+    //             return
+    //           }
+    //           selectBuild(node.id, node.data, nodeparent.data);
+    //       break;
+    //     case "arrange":
+    //     if (node.inputs.input_1.connections.length != 1) {
+    //             document.getElementById("settings-detail").innerHTML = `<div>only 1 parent</div>`;
+    //             return
+    //           }
+    //           // if parent node doesnt contain columns nok
+    //           if (typeof nodeparent.data.columns == "undefined" && nodeparent.data.columns == null) {
+    //             document.getElementById("settings-detail").innerHTML = `<div>no datasource columns</div>`;
+    //             return
+    //           }
+    //           arrangeBuild(node.id, node.data, nodeparent.data);
+    //       break;
+    //     case "subset":
+    //     if (node.inputs.input_1.connections.length != 1) {
+    //             document.getElementById("settings-detail").innerHTML = `<div>only 1 parent</div>`;
+    //             return
+    //           }
+    //           // if parent node doesnt contain columns nok
+    //           if (typeof nodeparent.data.columns == "undefined" && nodeparent.data.columns == null) {
+    //             document.getElementById("settings-detail").innerHTML = `<div>no datasource columns</div>`;
+    //             return
+    //           }
+    //           subsetBuild(node.id, node.data, nodeparent.data);
+    //       break;
+    //     case "rename":
 
-            if (node.inputs.input_1.connections.length != 1) {
-                document.getElementById("settings-detail").innerHTML = `<div>only 1 parent</div>`;
-                return
-              }
-            // if parent node doesnt contain columns nok
-            if (typeof nodeparent.data.columns == "undefined" && nodeparent.data.columns == null) {
-              document.getElementById("settings-detail").innerHTML = `<div>no datasource columns</div>`;
-              return
-            }
-            filterAndBuild(node.id, node.data, nodeparent.data);
-          break;
-        case "select":
-        if (node.inputs.input_1.connections.length != 1) {
-                document.getElementById("settings-detail").innerHTML = `<div>only 1 parent</div>`;
-                return
-              }
-              // if parent node doesnt contain columns nok
-              if (typeof nodeparent.data.columns == "undefined" && nodeparent.data.columns == null) {
-                document.getElementById("settings-detail").innerHTML = `<div>no datasource columns</div>`;
-                return
-              }
-              selectBuild(node.id, node.data, nodeparent.data);
-          break;
-        case "arrange":
-        if (node.inputs.input_1.connections.length != 1) {
-                document.getElementById("settings-detail").innerHTML = `<div>only 1 parent</div>`;
-                return
-              }
-              // if parent node doesnt contain columns nok
-              if (typeof nodeparent.data.columns == "undefined" && nodeparent.data.columns == null) {
-                document.getElementById("settings-detail").innerHTML = `<div>no datasource columns</div>`;
-                return
-              }
-              arrangeBuild(node.id, node.data, nodeparent.data);
-          break;
-        case "subset":
-        if (node.inputs.input_1.connections.length != 1) {
-                document.getElementById("settings-detail").innerHTML = `<div>only 1 parent</div>`;
-                return
-              }
-              // if parent node doesnt contain columns nok
-              if (typeof nodeparent.data.columns == "undefined" && nodeparent.data.columns == null) {
-                document.getElementById("settings-detail").innerHTML = `<div>no datasource columns</div>`;
-                return
-              }
-              subsetBuild(node.id, node.data, nodeparent.data);
-          break;
-        case "rename":
+    //         if (node.inputs.input_1.connections.length != 1) {
+    //             document.getElementById("settings-detail").innerHTML = `<div>only 1 parent</div>`;
+    //             return
+    //           }
 
-            if (node.inputs.input_1.connections.length != 1) {
-                document.getElementById("settings-detail").innerHTML = `<div>only 1 parent</div>`;
-                return
-              }
+    //           // if parent node doesnt contain columns nok
+    //           if (typeof nodeparent.data.columns == "undefined" && nodeparent.data.columns == null) {
+    //             document.getElementById("settings-detail").innerHTML = `<div>no datasource columns</div>`;
+    //             return
+    //           }
+    //           renameBuild(node.id, node.data, nodeparent.data);
+    //       break;
+    //     case "join":
+    //         if (node.inputs.input_1.connections.length != 2) {
+    //             document.getElementById("settings-detail").innerHTML = `<div>need 2 datasources</div>`;
+    //             return
+    //           }
 
-              // if parent node doesnt contain columns nok
-              if (typeof nodeparent.data.columns == "undefined" && nodeparent.data.columns == null) {
-                document.getElementById("settings-detail").innerHTML = `<div>no datasource columns</div>`;
-                return
-              }
-              renameBuild(node.id, node.data, nodeparent.data);
-          break;
-        case "join":
-            if (node.inputs.input_1.connections.length != 2) {
-                document.getElementById("settings-detail").innerHTML = `<div>need 2 datasources</div>`;
-                return
-              }
+    //           let nodeparentB = editor.getNodeFromId(node.inputs.input_1.connections[1].node);
 
-              let nodeparentB = editor.getNodeFromId(node.inputs.input_1.connections[1].node);
-
-              // if parent node doesnt contain columns nok
-              if (typeof nodeparent.data.columns == "undefined" && nodeparent.data.columns == null) {
-                document.getElementById("settings-detail").innerHTML = `<div>no datasource columns</div>`;
-                return
-              }
+    //           // if parent node doesnt contain columns nok
+    //           if (typeof nodeparent.data.columns == "undefined" && nodeparent.data.columns == null) {
+    //             document.getElementById("settings-detail").innerHTML = `<div>no datasource columns</div>`;
+    //             return
+    //           }
               
-              if (typeof nodeparentB.data.columns == "undefined" && nodeparentB.data.columns == null) {
-                document.getElementById("settings-detail").innerHTML = `<div>no datasource columns</div>`;
-                return
-              }
+    //           if (typeof nodeparentB.data.columns == "undefined" && nodeparentB.data.columns == null) {
+    //             document.getElementById("settings-detail").innerHTML = `<div>no datasource columns</div>`;
+    //             return
+    //           }
               
-              joinBuild(node.id, node.data, nodeparent.data, nodeparentB.data);
-          break;
-        case "groupby":
-        if (node.inputs.input_1.connections.length != 1) {
-                document.getElementById("settings-detail").innerHTML = `<div>only 1 parent</div>`;
-                return
-              }
-              // if parent node doesnt contain columns nok
-              if (typeof nodeparent.data.columns == "undefined" && nodeparent.data.columns == null) {
-                document.getElementById("settings-detail").innerHTML = `<div>no datasource columns</div>`;
-                return
-              }
-              groupbyBuild(node.id, node.data, nodeparent.data);
-          break;
-        case "aggregate":
-        if (node.inputs.input_1.connections.length != 1) {
-                document.getElementById("settings-detail").innerHTML = `<div>only 1 parent</div>`;
-                return
-              }
-            // if parent node doesnt contain columns nok
-            if (typeof nodeparent.data.columns == "undefined" && nodeparent.data.columns == null) {
-              document.getElementById("settings-detail").innerHTML = `<div>no datasource columns</div>`;
-              return
-            }
+    //           joinBuild(node.id, node.data, nodeparent.data, nodeparentB.data);
+    //       break;
+    //     case "groupby":
+    //     if (node.inputs.input_1.connections.length != 1) {
+    //             document.getElementById("settings-detail").innerHTML = `<div>only 1 parent</div>`;
+    //             return
+    //           }
+    //           // if parent node doesnt contain columns nok
+    //           if (typeof nodeparent.data.columns == "undefined" && nodeparent.data.columns == null) {
+    //             document.getElementById("settings-detail").innerHTML = `<div>no datasource columns</div>`;
+    //             return
+    //           }
+    //           groupbyBuild(node.id, node.data, nodeparent.data);
+    //       break;
+    //     // case "aggregate":
+    //     // if (node.inputs.input_1.connections.length != 1) {
+    //     //         document.getElementById("settings-detail").innerHTML = `<div>only 1 parent</div>`;
+    //     //         return
+    //     //       }
+    //     //     // if parent node doesnt contain columns nok
+    //     //     if (typeof nodeparent.data.columns == "undefined" && nodeparent.data.columns == null) {
+    //     //       document.getElementById("settings-detail").innerHTML = `<div>no datasource columns</div>`;
+    //     //       return
+    //     //     }
 
-            let typer = "groupby";
-            // if (nodeparent.name != "groupby" || nodeparent.name != "aggregate") {
-            if (nodeparent.name != "groupby") {
-              if (nodeparent.name != "aggregate") {
-                document.getElementById("settings-detail").innerHTML = `<div>parent must be groupby or aggregate node</div>`;
-                return
-              } else {
-                typer = "aggregate";
-              }
+    //     //     let typer = "groupby";
+    //     //     // if (nodeparent.name != "groupby" || nodeparent.name != "aggregate") {
+    //     //     if (nodeparent.name != "groupby") {
+    //     //       if (nodeparent.name != "aggregate") {
+    //     //         document.getElementById("settings-detail").innerHTML = `<div>parent must be groupby or aggregate node</div>`;
+    //     //         return
+    //     //       } else {
+    //     //         typer = "aggregate";
+    //     //       }
               
-            }
+    //     //     }
 
-            aggregateBuild(node.id, node.data, nodeparent.data, nodeparent.id, typer);
-          break;
-        default:
-          break;
-      }
+    //     //     aggregateBuild(node.id, node.data, nodeparent.data, nodeparent.id, typer);
+    //     //   break;
+    //     default:
+    //       break;
+    //   }
 
-    })
+    // })
 
     editor.on('moduleCreated', function(name) {
       console.log("Module Created " + name);
@@ -459,6 +459,10 @@
     editor.on('moduleChanged', function(name) {
       console.log("Module Changed " + name);
     })
+
+    // editor.on('contextmenu', function(event) {
+    //   console.log(event.path[3].id.substring(5));
+    // })
 
     editor.on('connectionCreated', function(connection) {
       console.log('Connection created');
@@ -867,6 +871,198 @@
 
     }
 
+    function openSettings(event) {
+        console.log(event.path[3].id.substring(5));
+
+        let id = event.path[3].id.substring(5);
+
+        let node = editor.getNodeFromId(id);
+
+      console.log(node);
+
+      if (node.name == "start" || node.name == "end") {
+          // document.getElementById("settings-detail").innerHTML = `<div>`+ node.name +`</div>`;
+          return
+      }
+
+      if (node.inputs.input_1.connections.length == 0) {
+          // document.getElementById("settings-detail").innerHTML = `<div>no connections</div>`;
+          notie.alert({ type: 'warning', text: 'no connections' })
+          return
+      }
+      // document.getElementById("settings-detail").innerHTML = "";
+
+      // Swal.fire({
+      //   title: 'Error!',
+      //   text: 'Do you want to continue',
+      //   icon: 'error',
+      //   confirmButtonText: 'Cool'
+      // })
+
+      // return
+      myOffsideLeft.close();
+      myOffsideRight.open();
+
+
+      let nodeparent = editor.getNodeFromId(node.inputs.input_1.connections[0].node);
+
+      // if (typeof node.data.columns != "undefined" && node.data.columns != null) {
+      //         columnTable.setData(node.data.columns);
+      //     } else {
+      //         columnTable.setData([]);
+      //     }
+
+      switch (node.name) {
+        case "datasource":
+            datasourceBuild(node.id, node.data);
+          break;
+        case "dataget":
+        if (node.inputs.input_1.connections.length != 1) {
+                document.getElementById("settings-detail").innerHTML = `<div>only 1 parent</div>`;
+                return
+              }
+            // if parent node doesnt contain columns nok
+            if (typeof nodeparent.data.tables == "undefined" && nodeparent.data.tables == null) {
+              document.getElementById("settings-detail").innerHTML = `<div>no datasource connected</div>`;
+              return
+            }
+            if (nodeparent.name != "datasource") {
+                document.getElementById("settings-detail").innerHTML = `<div>parent must be datasource</div>`;
+                return
+              }
+
+            datagetBuild(node.id, node.data, nodeparent.data);
+          break;
+        case "filterbuild":
+
+              // console.log("here");
+
+            if (node.inputs.input_1.connections.length != 1) {
+                document.getElementById("settings-detail").innerHTML = `<div>only 1 parent</div>`;
+                return
+              }
+            // if parent node doesnt contain columns nok
+            if (typeof nodeparent.data.columns == "undefined" && nodeparent.data.columns == null) {
+              document.getElementById("settings-detail").innerHTML = `<div>no datasource columns</div>`;
+              return
+            }
+            filterAndBuild(node.id, node.data, nodeparent.data);
+          break;
+        case "select":
+        if (node.inputs.input_1.connections.length != 1) {
+                document.getElementById("settings-detail").innerHTML = `<div>only 1 parent</div>`;
+                return
+              }
+              // if parent node doesnt contain columns nok
+              if (typeof nodeparent.data.columns == "undefined" && nodeparent.data.columns == null) {
+                document.getElementById("settings-detail").innerHTML = `<div>no datasource columns</div>`;
+                return
+              }
+              selectBuild(node.id, node.data, nodeparent.data);
+          break;
+        case "arrange":
+        if (node.inputs.input_1.connections.length != 1) {
+                document.getElementById("settings-detail").innerHTML = `<div>only 1 parent</div>`;
+                return
+              }
+              // if parent node doesnt contain columns nok
+              if (typeof nodeparent.data.columns == "undefined" && nodeparent.data.columns == null) {
+                document.getElementById("settings-detail").innerHTML = `<div>no datasource columns</div>`;
+                return
+              }
+              arrangeBuild(node.id, node.data, nodeparent.data);
+          break;
+        case "subset":
+        if (node.inputs.input_1.connections.length != 1) {
+                document.getElementById("settings-detail").innerHTML = `<div>only 1 parent</div>`;
+                return
+              }
+              // if parent node doesnt contain columns nok
+              if (typeof nodeparent.data.columns == "undefined" && nodeparent.data.columns == null) {
+                document.getElementById("settings-detail").innerHTML = `<div>no datasource columns</div>`;
+                return
+              }
+              subsetBuild(node.id, node.data, nodeparent.data);
+          break;
+        case "rename":
+
+            if (node.inputs.input_1.connections.length != 1) {
+                document.getElementById("settings-detail").innerHTML = `<div>only 1 parent</div>`;
+                return
+              }
+
+              // if parent node doesnt contain columns nok
+              if (typeof nodeparent.data.columns == "undefined" && nodeparent.data.columns == null) {
+                document.getElementById("settings-detail").innerHTML = `<div>no datasource columns</div>`;
+                return
+              }
+              renameBuild(node.id, node.data, nodeparent.data);
+          break;
+        case "join":
+            if (node.inputs.input_1.connections.length != 2) {
+                document.getElementById("settings-detail").innerHTML = `<div>need 2 datasources</div>`;
+                return
+              }
+
+              let nodeparentB = editor.getNodeFromId(node.inputs.input_1.connections[1].node);
+
+              // if parent node doesnt contain columns nok
+              if (typeof nodeparent.data.columns == "undefined" && nodeparent.data.columns == null) {
+                document.getElementById("settings-detail").innerHTML = `<div>no datasource columns</div>`;
+                return
+              }
+              
+              if (typeof nodeparentB.data.columns == "undefined" && nodeparentB.data.columns == null) {
+                document.getElementById("settings-detail").innerHTML = `<div>no datasource columns</div>`;
+                return
+              }
+              
+              joinBuild(node.id, node.data, nodeparent.data, nodeparentB.data);
+          break;
+        case "groupby":
+        if (node.inputs.input_1.connections.length != 1) {
+                document.getElementById("settings-detail").innerHTML = `<div>only 1 parent</div>`;
+                return
+              }
+              // if parent node doesnt contain columns nok
+              if (typeof nodeparent.data.columns == "undefined" && nodeparent.data.columns == null) {
+                document.getElementById("settings-detail").innerHTML = `<div>no datasource columns</div>`;
+                return
+              }
+              groupbyBuild(node.id, node.data, nodeparent.data);
+          break;
+        // case "aggregate":
+        // if (node.inputs.input_1.connections.length != 1) {
+        //         document.getElementById("settings-detail").innerHTML = `<div>only 1 parent</div>`;
+        //         return
+        //       }
+        //     // if parent node doesnt contain columns nok
+        //     if (typeof nodeparent.data.columns == "undefined" && nodeparent.data.columns == null) {
+        //       document.getElementById("settings-detail").innerHTML = `<div>no datasource columns</div>`;
+        //       return
+        //     }
+
+        //     let typer = "groupby";
+        //     // if (nodeparent.name != "groupby" || nodeparent.name != "aggregate") {
+        //     if (nodeparent.name != "groupby") {
+        //       if (nodeparent.name != "aggregate") {
+        //         document.getElementById("settings-detail").innerHTML = `<div>parent must be groupby or aggregate node</div>`;
+        //         return
+        //       } else {
+        //         typer = "aggregate";
+        //       }
+              
+        //     }
+
+        //     aggregateBuild(node.id, node.data, nodeparent.data, nodeparent.id, typer);
+        //   break;
+        default:
+          break;
+      }
+
+
+    }
+    
     function addNodeToDrawFlow(name, pos_x, pos_y) {
       if(editor.editor_mode === 'fixed') {
         return false;
@@ -878,7 +1074,7 @@
         case 'datasource':
         var datasourcetemp = `
         <div>
-          <div class="title-box"><i class="fas fa-database"></i> datasource</div>
+          <div class="title-box" ondblclick="openSettings(event)"><i class="fas fa-database"></i> datasource</div>
         </div>
         `;
           editor.addNode('datasource', 1,  1, pos_x, pos_y, 'datasource', {"code": 'SKIP'}, datasourcetemp );
@@ -886,7 +1082,7 @@
       case 'dataget':
         var datagettemp = `
         <div>
-          <div class="title-box"><i class="fas fa-database"></i> dataget</div>
+          <div class="title-box" ondblclick="openSettings(event)"><i class="fas fa-database"></i> dataget</div>
         </div>
         `;
           editor.addNode('dataget', 1,  1, pos_x, pos_y, 'dataget', {"code": '#00#'}, datagettemp );
@@ -894,7 +1090,7 @@
         case 'join':
           var jointemp = `
           <div>
-            <div class="title-box"><i class="far fa-object-group"></i> join</div>
+            <div class="title-box" ondblclick="openSettings(event)"><i class="far fa-object-group"></i> join</div>
           </div>
           `
           editor.addNode('join', 1, 1, pos_x, pos_y, 'join', {"code": '#01#'}, jointemp );
@@ -902,7 +1098,7 @@
         case 'mutateadd':
           var mutateaddtemp = `
           <div>
-            <div class="title-box"><i class="fas fa-exchange-alt"></i> mutateadd</div>
+            <div class="title-box" ondblclick="openSettings(event)"><i class="fas fa-exchange-alt"></i> mutateadd</div>
           </div>
           `;
           editor.addNode('mutateadd', 1, 1, pos_x, pos_y, 'mutateadd', {"code": '#02#'}, mutateaddtemp );
@@ -910,7 +1106,7 @@
         case 'mutatechange':
           var mutatechangetemp = `
           <div>
-            <div class="title-box"><i class="fas fa-exchange-alt"></i> mutatechange</div>
+            <div class="title-box" ondblclick="openSettings(event)"><i class="fas fa-exchange-alt"></i> mutatechange</div>
           </div>
           `;
           editor.addNode('mutatechange', 1, 1, pos_x, pos_y, 'mutatechange', {"code": '#03#'}, mutatechangetemp );
@@ -918,7 +1114,7 @@
         case 'filterbuild':
           var filterbuildtemp = `
           <div>
-            <div class="title-box"><i class="fas fa-filter"></i> Filter Build</div>
+            <div class="title-box" ondblclick="openSettings(event)"><i class="fas fa-filter"></i> Filter Build</div>
           </div>
           `;
           editor.addNode('filterbuild', 1, 1, pos_x, pos_y, 'filterbuild', {"code": '#04#', "optionscount" : 1}, filterbuildtemp );
@@ -926,7 +1122,7 @@
         case 'groupby':
           var groupbytemp = `
           <div>
-            <div class="title-box"><i class="fas fa-layer-group"></i> GroupBy </div>
+            <div class="title-box" ondblclick="openSettings(event)"><i class="fas fa-layer-group"></i> GroupBy </div>
           </div>
           `;
           editor.addNode('groupby', 1, 1, pos_x, pos_y, 'groupby', {"code": '#06#'}, groupbytemp );
@@ -934,7 +1130,7 @@
         case 'aggregate':
             var aggregatemp = `
             <div>
-              <div class="title-box"><i class="fas fa-calculator"></i> aggregate </div>
+              <div class="title-box" ondblclick="openSettings(event)"><i class="fas fa-calculator"></i> aggregate </div>
             </div>
             `;
             editor.addNode('aggregate', 1, 1, pos_x, pos_y, 'aggregate', {"code": '#07#'}, aggregatemp );
@@ -942,7 +1138,7 @@
           case 'select':
             var selecttemp = `
             <div>
-              <div class="title-box"><i class="fas fa-columns"></i> select </div>             
+              <div class="title-box" ondblclick="openSettings(event)"><i class="fas fa-columns"></i> select </div>             
             </div>
             `;
 
@@ -952,7 +1148,7 @@
           case 'arrange':
             var arrangetemp = `
             <div>
-              <div class="title-box"><i class="fas fa-sort-amount-up-alt"></i> arrange</div>
+              <div class="title-box" ondblclick="openSettings(event)"><i class="fas fa-sort-amount-up-alt"></i> arrange</div>
             </div>
             `;
             editor.addNode('arrange', 1, 1, pos_x, pos_y, 'arrange', {"code": '#11#'}, arrangetemp );
@@ -960,7 +1156,7 @@
           case 'subset':
             var subsettemp = `
             <div>
-                <div class="title-box"><i class="fas fa-grip-lines"></i> subset</div>
+                <div class="title-box" ondblclick="openSettings(event)"><i class="fas fa-grip-lines"></i> subset</div>
             </div>
             `;
             editor.addNode('subset', 1, 1, pos_x, pos_y, 'subset', {"code": '#12#'}, subsettemp );
@@ -968,7 +1164,7 @@
           case 'rename':
             var renametemp = `
             <div>
-                <div class="title-box"><i class="fas fa-signature"></i> rename</div>
+                <div class="title-box" ondblclick="openSettings(event)"><i class="fas fa-signature"></i> rename</div>
             </div>
             `;
             editor.addNode('rename', 1, 1, pos_x, pos_y, 'rename', {"code": '#13#'}, renametemp );
@@ -976,7 +1172,7 @@
         case 'start':
             var starttemp = `
             <div>
-                <div class="title-box"><i class="fas fa-genderless"></i> start</div>
+                <div class="title-box" ondblclick="openSettings(event)"><i class="fas fa-genderless"></i> start</div>
             </div>
             `;
             editor.addNode('start', 0, 1, pos_x, pos_y, 'start', {"code": 'SKIP'}, starttemp );
@@ -984,7 +1180,7 @@
         case 'end':
             var endtemp = `
             <div>
-                <div class="title-box"><i class="fas fa-genderless"></i> end</div>
+                <div class="title-box" ondblclick="openSettings(event)"><i class="fas fa-genderless"></i> end</div>
             </div>
             `;
             editor.addNode('end', 1, 0, pos_x, pos_y, 'end', {"code": 'SKIP'}, endtemp );
@@ -1116,7 +1312,12 @@
               nodeData.dbdatabase = document.getElementById("ds-db-database").value;
               nodeData.tables = cols.Tables;
 
-              editor.updateNodeDataFromId(id, nodeData);  
+              editor.updateNodeDataFromId(id, nodeData);
+
+              myOffsideRight.close();
+
+              notie.alert({ type: 'success', text: 'Added Setting to Command' });
+
             }
 
 
@@ -1193,8 +1394,9 @@
 
               function updater(cols) {
 
+                
 
-                nodeData.table = document.getElementById("dg-table").value;
+              nodeData.table = document.getElementById("dg-table").value;
               nodeData.dbsql = document.getElementById("dg-sql").value;
               
               nodeData.source = parentData.source + "." + document.getElementById("dg-dataname").value + "_" + id;
@@ -1204,9 +1406,29 @@
               nodeData.dbuser = parentData.dbuser;
               nodeData.dbpassword = parentData.dbpassword;
               nodeData.dbdatabase = parentData.dbdatabase;
-                nodeData.columns = cols.Columns;
+
+
+              let newcolumnNames = [];
+              let newcolumnsBuild = [];
+
+              console.log(cols);
+
+                for (let index = 0; index < cols.Columns[0].length; index++) {
+                  console.log(cols.Columns[0][index]);
+                  newcolumnNames.push(nodeData.source + "." + cols.Columns[0][index]);
+                  
+                }
+
+                newcolumnsBuild.push(newcolumnNames);
+
+                // nodeData.columns = cols.Columns;
+                nodeData.columns = newcolumnsBuild;
 
                 editor.updateNodeDataFromId(id, nodeData);  
+
+                myOffsideRight.close();
+
+              notie.alert({ type: 'success', text: 'Added Setting to Command' });
               }
 
 
@@ -1368,6 +1590,10 @@
                 nodeData.source = parentData.source;
 
                 editor.updateNodeDataFromId(id, nodeData);  
+
+                myOffsideRight.close();
+
+              notie.alert({ type: 'success', text: 'Added Setting to Command' });
             });
           }
 
@@ -1415,6 +1641,10 @@
                   nodeData.source = parentData.source;
 
                   editor.updateNodeDataFromId(id, nodeData);  
+
+                  myOffsideRight.close();
+
+              notie.alert({ type: 'success', text: 'Added Setting to Command' });
               });
 
             }
@@ -1449,6 +1679,10 @@
             nodeData.source = parentData.source;
 
             editor.updateNodeDataFromId(id, nodeData);  
+
+            myOffsideRight.close();
+
+              notie.alert({ type: 'success', text: 'Added Setting to Command' });
         });
 
       }
@@ -1470,6 +1704,8 @@
                   `;
 
         document.getElementById("settings-detail").innerHTML = inner;
+
+        console.log(parentData);
 
         parentData.columns[0].forEach(function(element) {
         var x = document.getElementById("rn-column");
@@ -1497,8 +1733,8 @@
 
             parentData.columns[0].forEach(function(element) {
                 if (element == nodeData.column) {
-                  // newColumns.push(parentData.source + ":" + nodeData.value);
-                  newColumns.push(nodeData.value);
+                  newColumns.push(parentData.source + "." + nodeData.value);
+                  // newColumns.push(nodeData.value);
                 } else {
                   newColumns.push(element);
                 }
@@ -1506,12 +1742,15 @@
 
             endColumn.push(newColumns);
 
-            
             nodeData.columns = endColumn;
             nodeData.columnsorginal = parentData.columns;
             nodeData.source = parentData.source;
 
             editor.updateNodeDataFromId(id, nodeData);  
+
+            myOffsideRight.close();
+
+              notie.alert({ type: 'success', text: 'Added Setting to Command' });
         });
 
       }
@@ -1521,71 +1760,94 @@
         let inner = `<form>
                     <div class="row">
                       <div class="column">
-                        <div id="mr-check-loop"></div>
+                        <select class="u-full-width" multiple id="js-choice"></select>
                       </div>
                       </div>
                     </form>
-                    <div id= "js-choice"></div>
+                    
                     <a class="button button-primary" id="mr-save" href="#">Save</a>
                     `;
 
           document.getElementById("settings-detail").innerHTML = inner;
 
-          const element = document.querySelector('.js-choice');
+          const element = document.querySelector('#js-choice');
 
-          parentData.columns[0].forEach(function(element) {
-              var x = document.getElementById("mr-check-loop");
-              var option = document.createElement("label");
-              
-              var inner = document.createElement("input");
-              inner.setAttribute("type", "checkbox");
-
-              if (typeof nodeData.columns == "undefined" && nodeData.columns == null) {
-                    inner.checked = true;
-                  } else {                  
-                    if (nodeData.columns[0].includes(element)) {
-                      inner.checked = true;
-                    } else {
-                      inner.checked = false;
-                    }
-                  }
-
-              inner.classList.add("mr");
-              inner.name = element;
-
-              var te = document.createElement("span");
-              te.innerText = element;
-              te.classList.add("label-body");
-
-              option.appendChild(inner);              
-              option.appendChild(te);              
-
-              x.appendChild(option);
+          // Calling a method directly
+          const choices = new Choices(element, {
+            // addItems: true,
+            // removeItems: true,
+            removeItemButton: true,
           });
+
+          // const choices = new Choices(element);
+
+          // choices.setValue(['Set value 1', 'Set value 2']);
+          choices.setValue(parentData.columns[0]);
+
+
+            // console.log(parentData.columns[0]);
+
+            // let loadList = [];
+
+          // parentData.columns[0].forEach(function(element) {
+          //     // var x = document.getElementById("mr-check-loop");
+          //     // var option = document.createElement("label");
+              
+          //     // var inner = document.createElement("input");
+          //     // inner.setAttribute("type", "checkbox");
+
+          //     // if (typeof nodeData.columns == "undefined" && nodeData.columns == null) {
+          //     //       inner.checked = true;
+          //     //     } else {                  
+          //     //       if (nodeData.columns[0].includes(element)) {
+          //     //         inner.checked = true;
+          //     //       } else {
+          //     //         inner.checked = false;
+          //     //       }
+          //     //     }
+
+          //     // inner.classList.add("mr");
+          //     // inner.name = element;
+
+          //     // var te = document.createElement("span");
+          //     te.innerText = element;
+          //     // te.classList.add("label-body");
+
+          //     // option.appendChild(inner);              
+          //     // option.appendChild(te);              
+
+          //     // x.appendChild(option);
+          // });
 
           document.getElementById("mr-save").addEventListener("click", function (event) {
               event.preventDefault();
-              let selectedColumns = [];
+
+              let values = choices.getValue(true);
+
+              // console.log(values);
+
+
+              // let selectedColumns = [];
               // let keptColumns = [];
 
               let endColumn = [];
-              let inputs = document.getElementsByClassName("mr");
+              // let inputs = document.getElementsByClassName("mr");
 
-              for(var i = 0; i < inputs.length; i++) {
-                if(inputs[i].type == "checkbox") {
+              // for(var i = 0; i < inputs.length; i++) {
+              //   if(inputs[i].type == "checkbox") {
 
-                    if (inputs[i].checked == true) {
-                      selectedColumns.push(inputs[i].name);
-                    } 
-                    // else {
-                    //   keptColumns.push(inputs[i].name);
-                    // }
+              //       if (inputs[i].checked == true) {
+              //         selectedColumns.push(inputs[i].name);
+              //       } 
+              //       // else {
+              //       //   keptColumns.push(inputs[i].name);
+              //       // }
 
                     
-                }  
-              }
+              //   }  
+              // }
 
-              endColumn.push(selectedColumns);
+              endColumn.push(values);
 
               // nodeData.selectedcolumns = selectedColumns;
               nodeData.columns = endColumn;
@@ -1593,6 +1855,14 @@
               nodeData.source = parentData.source;
 
               editor.updateNodeDataFromId(id, nodeData);  
+
+              // console.log(nodeData);
+
+              myOffsideRight.close();
+
+              notie.alert({ type: 'success', text: 'Added Setting to Command' });
+
+              
           });
 
         }
@@ -1707,6 +1977,10 @@
             nodeData.source = parentDataA.source+ ":" + parentDataB.source;
 
             editor.updateNodeDataFromId(id, nodeData);
+
+            myOffsideRight.close();
+
+              notie.alert({ type: 'success', text: 'Added Setting to Command' });
         });
 
       }
@@ -1716,99 +1990,54 @@
           let inner = `<form>
                       <div class="row">
                         <div class="column">
-                          <div id="gp-check-loop"></div>
+                          <select class="u-full-width" multiple id="js-choice"></select>
                         </div>
                         </div>
+                        <div class="row">
+                        <div class="column">
+                          <label for="ag-agtype">agtype</label>
+                            <select class="u-full-width" id="ag-agtype">
+                              <option ${(nodeData.agtype == 'SUM') ? 'selected' : ''} value="SUM">SUM</option>
+                              <option ${(nodeData.agtype == 'COUNT') ? 'selected' : ''} value="COUNT">COUNT</option>
+                            </select>
+                          <label for="ag-column">Column</label>
+                          <select class="u-full-width" id="ag-column">
+                          </select>
+                        </div>
+                        </div>
+                      </div>
                       </form>
+                      <input class="u-full-width" type="number" id="ag-optionscount" value="${(nodeData.optionscount) ? nodeData.optionscount : '1'}">
+                      <div id="additionRows">
+                        <a class="button button-primary" id="ag-add" href="#">Add</a>
+                        <table id="filter-table"><thead>
+                          <tr>
+                            <th>A</th>
+                            <th>B</th>
+                          </tr>
+                        </thead><tbody></tbody></table>
+                      </div>
                       <a class="button button-primary" id="gp-save" href="#">Save</a>
                       `;
 
             document.getElementById("settings-detail").innerHTML = inner;
 
-            parentData.columns[0].forEach(function(element) {
-                var x = document.getElementById("gp-check-loop");
-                var option = document.createElement("label");
-                
-                var inner = document.createElement("input");
-                inner.setAttribute("type", "checkbox");
+            const element = document.querySelector('#js-choice');
 
-                if (typeof nodeData.columns == "undefined" && nodeData.columns == null) {
-                  inner.checked = false;
-                } else {
-                  if (nodeData.columns[0].includes(element)) {
-                    inner.checked = true;
-                  } else {
-                    inner.checked = false;
-                  }
-                }
+          // Calling a method directly
+          const choices = new Choices(element, {
+            // addItems: true,
+            // removeItems: true,
+            removeItemButton: true,
+          });
 
-                inner.classList.add("gp");
-                inner.name = element;
+          // const choices = new Choices(element);
 
-                var te = document.createElement("span");
-                te.innerText = element;
-                te.classList.add("label-body");
+          // choices.setValue(['Set value 1', 'Set value 2']);
+          choices.setValue(parentData.columns[0]);
+          // choices.unhighlightAll();
 
-                option.appendChild(inner);              
-                option.appendChild(te);              
-
-                x.appendChild(option);
-            });
-
-            document.getElementById("gp-save").addEventListener("click", function (event) {
-                event.preventDefault();
-                let selectedColumns = [];
-                let endColumn = [];
-                let inputs = document.getElementsByClassName("gp");
-
-                for(var i = 0; i < inputs.length; i++) {
-                  if(inputs[i].type == "checkbox") {
-
-                      if (inputs[i].checked == true) {
-                        selectedColumns.push(inputs[i].name);
-                      } 
-                      
-                  }  
-                }
-
-                endColumn.push(selectedColumns);
-                nodeData.columns = endColumn;
-                nodeData.columnsorginal = parentData.columns;
-                nodeData.source = parentData.source;
-                nodeData.aggs = [];
-
-                editor.updateNodeDataFromId(id, nodeData);  
-            });
-
-          }
-
-    function aggregateBuild(id, nodeData, parentData, parentID, parentType){
-
-      let inner = `<form>
-                  <div class="row">
-                    <div class="column">
-                      <label for="ag-agtype">agtype</label>
-                        <select class="u-full-width" id="ag-agtype">
-                          <option ${(nodeData.agtype == 'MAX') ? 'selected' : ''} value="MAX">MAX</option>
-                          <option ${(nodeData.agtype == 'MEAN') ? 'selected' : ''} value="MEAN">MEAN</option>
-                          <option ${(nodeData.agtype == 'MEDIAN') ? 'selected' : ''} value="MEDIAN">MEDIAN</option>
-                          <option ${(nodeData.agtype == 'MIN') ? 'selected' : ''} value="MIN">MIN</option>
-                          <option ${(nodeData.agtype == 'STD') ? 'selected' : ''} value="STD">STD</option>
-                          <option ${(nodeData.agtype == 'SUM') ? 'selected' : ''} value="SUM">SUM</option>
-                          <option ${(nodeData.agtype == 'COUNT') ? 'selected' : ''} value="COUNT">COUNT</option>
-                        </select>
-                      <label for="ag-column">Column</label>
-                      <select class="u-full-width" id="ag-column">
-                      </select>
-                    </div>
-                    </div>
-                  </form>
-                  <a class="button button-primary" id="ag-save" href="#">Save</a>
-                  `;
-
-        document.getElementById("settings-detail").innerHTML = inner;
-
-        parentData.columnsorginal[0].forEach(function(element) {
+          parentData.columns[0].forEach(function(element) {
           var x = document.getElementById("ag-column");
             var option = document.createElement("option");
             option.text = element;
@@ -1822,32 +2051,191 @@
         });
 
 
-        document.getElementById("ag-save").addEventListener("click", function (event) {
-            event.preventDefault();
+            // parentData.columns[0].forEach(function(element) {
+            //     var x = document.getElementById("gp-check-loop");
+            //     var option = document.createElement("label");
+                
+            //     var inner = document.createElement("input");
+            //     inner.setAttribute("type", "checkbox");
 
-            nodeData.column = document.getElementById("ag-column").value;
-            nodeData.agtype = document.getElementById("ag-agtype").value;
-            nodeData.columns = parentData.columns;
-            nodeData.columnsorginal = parentData.columnsorginal;
-            nodeData.source = parentData.source;
+            //     if (typeof nodeData.columns == "undefined" && nodeData.columns == null) {
+            //       inner.checked = false;
+            //     } else {
+            //       if (nodeData.columns[0].includes(element)) {
+            //         inner.checked = true;
+            //       } else {
+            //         inner.checked = false;
+            //       }
+            //     }
 
-            if (parentType == "groupby") {
-              nodeData.groupbyid = parentID;
-            } else {
-              nodeData.groupbyid = parentData.groupbyid;
-            }
+            //     inner.classList.add("gp");
+            //     inner.name = element;
 
-            nodeData.columns[0].push(nodeData.column+"_"+nodeData.agtype);
-            editor.updateNodeDataFromId(id, nodeData);
+            //     var te = document.createElement("span");
+            //     te.innerText = element;
+            //     te.classList.add("label-body");
+
+            //     option.appendChild(inner);              
+            //     option.appendChild(te);              
+
+            //     x.appendChild(option);
+            // });
+
+            
+
+            let dataTable = new simpleDatatables.DataTable("#filter-table", {
+                searchable: false,
+                fixedHeight: false,
+            });
+
+            if (typeof nodeData.aggs != 'undefined' ) {
+
+              // if (nodeData.aggs.length > 1) {
+                // document.getElementById("additionRows").hidden = false;
+
+                for (var i = 0; i < nodeData.aggs.length; i++) {
+
+                dataTable.rows().add([
+                        nodeData.aggs[0].agtype,
+                        nodeData.aggs[0].column,
+                  ]);
+
+                  document.getElementById("ag-optionscount").value = dataTable.data.length;
+
+                }
+
+              // } else {
+                  document.getElementById("ag-agtype").value = nodeData.aggs[0].agtype;
+                  document.getElementById("ag-column").value = nodeData.aggs[0].column;
+              // }
+              }
+           
+
+            document.getElementById("ag-add").addEventListener("click", function (event) {
+                event.preventDefault();
+
+                  dataTable.rows().add([
+                      document.getElementById("ag-agtype").value,
+                      document.getElementById("ag-column").value
+                  ]);
+
+                  document.getElementById("ag-optionscount").value = dataTable.data.length;
 
 
-            let nodeNew = editor.getNodeFromId(nodeData.groupbyid);
-            nodeNew.data.aggs.push(nodeData);
-            editor.updateNodeDataFromId(nodeNew.id, nodeNew.data);
+            });
 
-        });
+            document.getElementById("gp-save").addEventListener("click", function (event) {
+                event.preventDefault();
+                // let selectedColumns = [];
+                let values = choices.getValue(true);
+                let endColumn = [];
+                // let inputs = document.getElementsByClassName("gp");
 
-      }
+                // for(var i = 0; i < inputs.length; i++) {
+                //   if(inputs[i].type == "checkbox") {
+
+                //       if (inputs[i].checked == true) {
+                //         selectedColumns.push(inputs[i].name);
+                //       } 
+                      
+                //   }  
+                // }
+
+                // endColumn.push(selectedColumns);
+                endColumn.push(values);
+                nodeData.columns = endColumn;
+                nodeData.columnsorginal = parentData.columns;
+                nodeData.source = parentData.source;
+                nodeData.aggs = [];
+
+                for (var i = 0; i < dataTable.data.length; i++) {
+                    let d = [].slice.call(dataTable.data[i].cells).map(function(cell) { return cell.textContent;});
+                    let mapp = {
+                      "agtype" : d[0],
+                      "column": d[1],
+                    }
+                    nodeData.aggs.push(mapp);
+                  }
+
+
+                editor.updateNodeDataFromId(id, nodeData);  
+
+                myOffsideRight.close();
+
+              notie.alert({ type: 'success', text: 'Added Setting to Command' });
+            });
+
+          }
+
+    // function aggregateBuild(id, nodeData, parentData, parentID, parentType){
+
+    //   let inner = `<form>
+    //               <div class="row">
+    //                 <div class="column">
+    //                   <label for="ag-agtype">agtype</label>
+    //                     <select class="u-full-width" id="ag-agtype">
+    //                       <option ${(nodeData.agtype == 'MAX') ? 'selected' : ''} value="MAX">MAX</option>
+    //                       <option ${(nodeData.agtype == 'MEAN') ? 'selected' : ''} value="MEAN">MEAN</option>
+    //                       <option ${(nodeData.agtype == 'MEDIAN') ? 'selected' : ''} value="MEDIAN">MEDIAN</option>
+    //                       <option ${(nodeData.agtype == 'MIN') ? 'selected' : ''} value="MIN">MIN</option>
+    //                       <option ${(nodeData.agtype == 'STD') ? 'selected' : ''} value="STD">STD</option>
+    //                       <option ${(nodeData.agtype == 'SUM') ? 'selected' : ''} value="SUM">SUM</option>
+    //                       <option ${(nodeData.agtype == 'COUNT') ? 'selected' : ''} value="COUNT">COUNT</option>
+    //                     </select>
+    //                   <label for="ag-column">Column</label>
+    //                   <select class="u-full-width" id="ag-column">
+    //                   </select>
+    //                 </div>
+    //                 </div>
+    //               </form>
+    //               <a class="button button-primary" id="ag-save" href="#">Save</a>
+    //               `;
+
+    //     document.getElementById("settings-detail").innerHTML = inner;
+
+    //     parentData.columnsorginal[0].forEach(function(element) {
+    //       var x = document.getElementById("ag-column");
+    //         var option = document.createElement("option");
+    //         option.text = element;
+    //         option.value = element;
+
+    //         if (element == nodeData.column) {
+    //           option.selected = true;
+    //         }
+
+    //         x.add(option);
+    //     });
+
+
+    //     document.getElementById("ag-save").addEventListener("click", function (event) {
+    //         event.preventDefault();
+
+    //         nodeData.column = document.getElementById("ag-column").value;
+    //         nodeData.agtype = document.getElementById("ag-agtype").value;
+    //         nodeData.columns = parentData.columns;
+    //         nodeData.columnsorginal = parentData.columnsorginal;
+    //         nodeData.source = parentData.source;
+
+    //         if (parentType == "groupby") {
+    //           nodeData.groupbyid = parentID;
+    //         } else {
+    //           nodeData.groupbyid = parentData.groupbyid;
+    //         }
+
+    //         nodeData.columns[0].push(nodeData.column+"_"+nodeData.agtype);
+    //         editor.updateNodeDataFromId(id, nodeData);
+
+
+    //         let nodeNew = editor.getNodeFromId(nodeData.groupbyid);
+    //         nodeNew.data.aggs.push(nodeData);
+    //         editor.updateNodeDataFromId(nodeNew.id, nodeNew.data);
+
+    //         myOffsideRight.close();
+
+    //           notie.alert({ type: 'success', text: 'Added Setting to Command' });
+    //     });
+
+    //   }
 
   </script>
 </body>

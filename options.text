@@ -1,0 +1,5 @@
+<option ${(nodeData.agtype == 'MAX') ? 'selected' : ''} value="MAX">MAX</option>
+<option ${(nodeData.agtype == 'MEAN') ? 'selected' : ''} value="MEAN">MEAN</option>
+<option ${(nodeData.agtype == 'MEDIAN') ? 'selected' : ''} value="MEDIAN">MEDIAN</option>
+<option ${(nodeData.agtype == 'MIN') ? 'selected' : ''} value="MIN">MIN</option>
+<option ${(nodeData.agtype == 'STD') ? 'selected' : ''} value="STD">STD</option>
