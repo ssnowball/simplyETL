@@ -56,7 +56,7 @@ There are buttons to help you and to run your final command instructions
     - [x] Subset
     - [x] Arrange
     - [x] Filter
-    - [ ] GroupBy
+    - [x] GroupBy
         - rebuild to 1 command to include aggeregate
 - [ ] Right join / Cross join?
 - [ ] Distinct

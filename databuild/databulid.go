@@ -355,7 +355,7 @@ func RunDataChange(command interface{}) (err error) {
 						groupList[strings.Join(groupListString, "|")] = make(map[string]float64)
 
 						if keepRow == len(cols) {
-							newData = fmt.Sprintf("%v|GROUP;Y", string(v))
+							newData = fmt.Sprintf("%v|GROUP;Y|%v", string(v), strings.Join(groupListString, "|"))
 						} else {
 							newData = fmt.Sprintf("%v|GROUP;N", string(v))
 						}
@@ -379,11 +379,15 @@ func RunDataChange(command interface{}) (err error) {
 				return err
 			}
 
-			for _, v := range aggs {
+			// fmt.Println(groupList)
+
+			for i0, v := range aggs {
 				v2 := v.(map[string]interface{})
 
-				fmt.Println("AGGS RANGER0-------------------")
-				fmt.Println(v2)
+				// if i0 == len(aggs)
+
+				// fmt.Println("AGGS RANGER0-------------------")
+				// fmt.Println(v2)
 
 				err = dbKV.Update(func(txn *badger.Txn) error {
 					opts := badger.DefaultIteratorOptions
@@ -392,43 +396,69 @@ func RunDataChange(command interface{}) (err error) {
 					defer it.Close()
 					for it.Rewind(); it.Valid(); it.Next() {
 						item := it.Item()
-						// k := item.Key()
+						k := item.Key()
 						err := item.Value(func(v []byte) error {
 							//matched db row
+
+							// fmt.Println("FIRST MATCH-------------------------")
+							// fmt.Println(string(v))
 
 							if strings.Contains(string(v), "GROUP;Y") {
 
 								getColumns := strings.Split(string(v), "|")
+								groupColum := getColumns[len(getColumns)-1]
+
+								// fmt.Println("LAST COLUMN ----------------------")
+								// fmt.Println()
 
 								for _, v3 := range getColumns {
 
 									getColumnName := strings.Split(v3, ";")
 
+									// fmt.Println("SECOND MATCH-----------------------")
+									// fmt.Println(v2["column"].(string))
+									// fmt.Println(getColumnName[0])
+
 									if v2["column"].(string) == getColumnName[0] {
 
+										// fmt.Println("MATCHED----------------------")
+
 										val, _ := strconv.ParseFloat(getColumnName[1], 64)
+										// if err != nil {
+										// 	fmt.Println("CONVERSION ERROR-----------------")
+										// }
+
+										// fmt.Println("THIRD MATCH-------------------")
+										// fmt.Println(v2["agtype"].(string))
+										// fmt.Println(val)
 
 										switch v2["agtype"].(string) {
 										case "MAX":
-											old := groupList[v3]["MAX"]
+											old := groupList[groupColum]["MAX"]
 											if val > old {
-												groupList[v3]["MAX"] = val
+												groupList[groupColum]["MAX"] = val
 											}
 										case "MIN":
-											old := groupList[v3]["MIN"]
+											old := groupList[groupColum]["MIN"]
 											if val < old {
-												groupList[v3]["MIN"] = val
+												groupList[groupColum]["MIN"] = val
 											}
 										case "SUM":
-											groupList[v3]["SUM"] += val
+											// fmt.Println("MATCHED SUM-------------------")
+											groupList[groupColum]["SUM"] += val
 										case "COUNT":
-											groupList[v3]["COUNT"]++
+											groupList[groupColum]["COUNT"]++
 
 										}
 									}
 
+									// fmt.Println("GROUP CHECK")
+									// fmt.Println(groupList)
+
 								}
 							}
+
+							// fmt.Println("GOT HERE--------------------")
 
 							return nil
 						})
@@ -436,10 +466,12 @@ func RunDataChange(command interface{}) (err error) {
 							return err
 						}
 
-						// err = txn.Delete([]byte(string(k)))
-						// if err != nil {
-						// 	return err
-						// }
+						if i0 == (len(aggs) - 1) {
+							err = txn.Delete([]byte(string(k)))
+							if err != nil {
+								return err
+							}
+						}
 
 					}
 					return nil
@@ -452,8 +484,8 @@ func RunDataChange(command interface{}) (err error) {
 
 			counterA := 1
 
-			fmt.Println("GROUPLIST---------------")
-			fmt.Println(groupList)
+			// fmt.Println("GROUPLIST---------------")
+			// fmt.Println(groupList)
 
 			for i, v := range groupList {
 
@@ -468,16 +500,16 @@ func RunDataChange(command interface{}) (err error) {
 
 				newColumns = strings.Join(newColumnsBuild, "|")
 
-				fmt.Println(newColumns)
+				// fmt.Println(newColumns)
 
-				// err = dbKV.Update(func(txn *badger.Txn) error {
-				// 	e := badger.NewEntry([]byte(fmt.Sprintf("%02v.00", counterA)), []byte(fmt.Sprintf("%v|%v", i, newColumns))).WithTTL(time.Hour)
-				// 	err := txn.SetEntry(e)
-				// 	return err
-				// })
-				// if err != nil {
-				// 	return err
-				// }
+				err = dbKV.Update(func(txn *badger.Txn) error {
+					e := badger.NewEntry([]byte(fmt.Sprintf("%02v.00", counterA)), []byte(fmt.Sprintf("%v|%v", i, newColumns))).WithTTL(time.Hour)
+					err := txn.SetEntry(e)
+					return err
+				})
+				if err != nil {
+					return err
+				}
 
 				counterA++
 			}
