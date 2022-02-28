@@ -57,8 +57,9 @@ There are buttons to help you and to run your final command instructions
     - [x] Arrange
     - [x] Filter
     - [ ] GroupBy
-        - [x] rebuild to 1 command to include aggeregate
-        - [ ] correct select command to work after groupby
+        - [ ] rebuild to 1 command to include aggeregate
+        - [x] correct select command to work after groupby
+        - [ ] dealing with DATE/TIME COLUMNS ??
 - [ ] Right join / Cross join?
 - [ ] Distinct
 - [ ] Mutation of columns

@@ -252,8 +252,8 @@ func main() {
 						var rowHeaders []string
 
 						for _, v := range rowbase {
-							fmt.Println("OUPUT CHECK---------------")
-							fmt.Println(v)
+							// fmt.Println("OUPUT CHECK---------------")
+							// fmt.Println(v)
 							valueStrip := strings.Split(v, ";")
 							rowHeaders = append(rowHeaders, valueStrip[0])
 						}

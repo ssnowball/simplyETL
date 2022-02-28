@@ -309,14 +309,15 @@ func RunDataChange(command interface{}) (err error) {
 
 			// GROUP BY
 
-			cols := m["columns"].([]interface{})
+			cols := m["groupcolumns"].([]interface{})
 			aggs := m["aggs"].([]interface{})
 			colS := make(map[string]int)
 			groupList := make(map[string]map[string]float64)
-			// subList := make(map[string]float64)
+			colCheck := 0
 
 			for _, v := range cols[0].([]interface{}) {
 				colS[v.(string)] = 1
+				colCheck++
 			}
 
 			dbKV, err := badger.Open(badger.DefaultOptions("tmp/badger"))
@@ -354,8 +355,8 @@ func RunDataChange(command interface{}) (err error) {
 
 						groupList[strings.Join(groupListString, "|")] = make(map[string]float64)
 
-						if keepRow == len(cols) {
-							newData = fmt.Sprintf("%v|GROUP;Y|%v", string(v), strings.Join(groupListString, "|"))
+						if keepRow == colCheck {
+							newData = fmt.Sprintf("%v|GROUP;Y", string(v))
 						} else {
 							newData = fmt.Sprintf("%v|GROUP;N", string(v))
 						}
@@ -379,15 +380,13 @@ func RunDataChange(command interface{}) (err error) {
 				return err
 			}
 
-			// fmt.Println(groupList)
+			fmt.Println("---------FIRST LOOP---------------")
+			fmt.Println(groupList)
 
-			for i0, v := range aggs {
-				v2 := v.(map[string]interface{})
+			for iG := range groupList {
 
-				// if i0 == len(aggs)
-
-				// fmt.Println("AGGS RANGER0-------------------")
-				// fmt.Println(v2)
+				fmt.Println("-----------FIRST INNER LOOP-------------")
+				fmt.Println(iG)
 
 				err = dbKV.Update(func(txn *badger.Txn) error {
 					opts := badger.DefaultIteratorOptions
@@ -396,81 +395,148 @@ func RunDataChange(command interface{}) (err error) {
 					defer it.Close()
 					for it.Rewind(); it.Valid(); it.Next() {
 						item := it.Item()
-						k := item.Key()
+						// k := item.Key()
+						// var newData string
+						var groupListString []string
+
 						err := item.Value(func(v []byte) error {
+
+							// keepRow := 0
 							//matched db row
+							getColumns := strings.Split(string(v), "|")
 
-							// fmt.Println("FIRST MATCH-------------------------")
-							// fmt.Println(string(v))
+							for _, v2 := range getColumns {
+								// getColumnName := strings.Split(v2, ";")
 
-							if strings.Contains(string(v), "GROUP;Y") {
-
-								getColumns := strings.Split(string(v), "|")
-								groupColum := getColumns[len(getColumns)-1]
-
-								// fmt.Println("LAST COLUMN ----------------------")
-								// fmt.Println()
-
-								for _, v3 := range getColumns {
-
-									getColumnName := strings.Split(v3, ";")
-
-									// fmt.Println("SECOND MATCH-----------------------")
-									// fmt.Println(v2["column"].(string))
-									// fmt.Println(getColumnName[0])
-
-									if v2["column"].(string) == getColumnName[0] {
-
-										// fmt.Println("MATCHED----------------------")
-
-										val, _ := strconv.ParseFloat(getColumnName[1], 64)
-										// if err != nil {
-										// 	fmt.Println("CONVERSION ERROR-----------------")
-										// }
-
-										// fmt.Println("THIRD MATCH-------------------")
-										// fmt.Println(v2["agtype"].(string))
-										// fmt.Println(val)
-
-										switch v2["agtype"].(string) {
-										case "MAX":
-											old := groupList[groupColum]["MAX"]
-											if val > old {
-												groupList[groupColum]["MAX"] = val
-											}
-										case "MIN":
-											old := groupList[groupColum]["MIN"]
-											if val < old {
-												groupList[groupColum]["MIN"] = val
-											}
-										case "SUM":
-											// fmt.Println("MATCHED SUM-------------------")
-											groupList[groupColum]["SUM"] += val
-										case "COUNT":
-											groupList[groupColum]["COUNT"]++
-
-										}
-									}
-
-									// fmt.Println("GROUP CHECK")
-									// fmt.Println(groupList)
-
+								// _, keepCol := colS[getColumnName[0]]
+								if strings.Contains(iG, v2) {
+									groupListString = append(groupListString, v2)
+									// keepRow++
 								}
 							}
 
-							// fmt.Println("GOT HERE--------------------")
+							newChc := strings.Join(groupListString, "|")
+
+							if iG == newChc {
+								fmt.Println("-----FOUND ROW TO ADD TO----------")
+								fmt.Println(iG)
+								fmt.Println(newChc)
+
+								for _, v := range aggs {
+
+									fmt.Println("------------AGG LOOP----------")
+
+									v2 := v.(map[string]interface{})
+
+									columnNameNew := fmt.Sprintf("%v.%v", v2["column"], v2["agtype"])
+
+									for _, v3 := range getColumns {
+
+										getColumnName := strings.Split(v3, ";")
+
+										if v2["column"].(string) == getColumnName[0] {
+
+											val, _ := strconv.ParseFloat(getColumnName[1], 64)
+
+											switch v2["agtype"].(string) {
+											case "MAX":
+												old := groupList[newChc][columnNameNew]
+												if val > old {
+													groupList[newChc][columnNameNew] = val
+												}
+											case "MIN":
+												old := groupList[newChc][columnNameNew]
+												if val < old {
+													groupList[newChc][columnNameNew] = val
+												}
+											case "SUM":
+												// fmt.Println("MATCHED SUM-------------------")
+												// groupList[newChc]["SUM"] += val
+												groupList[newChc][columnNameNew] += val
+											case "COUNT":
+												// fmt.Println("------COUNT ADDD------------")
+												// fmt.Println(newChc)
+												// fmt.Printf("%v.%v\n", v2["column"], v2["agtype"])
+												groupList[newChc][columnNameNew]++
+
+											}
+										}
+
+									}
+
+									// err = dbKV.Update(func(txn *badger.Txn) error {
+									// 	opts := badger.DefaultIteratorOptions
+									// 	opts.PrefetchSize = 10
+									// 	it := txn.NewIterator(opts)
+									// 	defer it.Close()
+									// 	for it.Rewind(); it.Valid(); it.Next() {
+									// 		item := it.Item()
+									// 		// k := item.Key()
+									// 		err := item.Value(func(v []byte) error {
+									// 			//matched db row
+
+									// 			if strings.Contains(string(v), "GROUP;Y") {
+
+									// 				getColumns := strings.Split(string(v), "|")
+
+									// 				for _, v3 := range getColumns {
+
+									// 					getColumnName := strings.Split(v3, ";")
+
+									// 					if v2["column"].(string) == getColumnName[0] {
+
+									// 						val, _ := strconv.ParseFloat(getColumnName[1], 64)
+
+									// 						switch v2["agtype"].(string) {
+									// 						case "MAX":
+									// 							old := groupList[newChc][columnNameNew]
+									// 							if val > old {
+									// 								groupList[newChc][columnNameNew] = val
+									// 							}
+									// 						case "MIN":
+									// 							old := groupList[newChc][columnNameNew]
+									// 							if val < old {
+									// 								groupList[newChc][columnNameNew] = val
+									// 							}
+									// 						case "SUM":
+									// 							// fmt.Println("MATCHED SUM-------------------")
+									// 							// groupList[newChc]["SUM"] += val
+									// 							groupList[newChc][columnNameNew] += val
+									// 						case "COUNT":
+									// 							fmt.Println("------COUNT ADDD------------")
+									// 							fmt.Println(newChc)
+									// 							// fmt.Printf("%v.%v\n", v2["column"], v2["agtype"])
+									// 							groupList[newChc][columnNameNew]++
+
+									// 						}
+									// 					}
+
+									// 				}
+									// 			}
+
+									// 			return nil
+									// 		})
+									// 		if err != nil {
+									// 			return err
+									// 		}
+
+									// 	}
+									// 	return nil
+									// })
+									// if err != nil {
+									// 	return err
+									// }
+
+								}
+
+							}
+
+							// groupList[strings.Join(groupListString, "|")] = make(map[string]float64)
 
 							return nil
 						})
 						if err != nil {
 							return err
-						}
-
-						if i0 == (len(aggs) - 1) {
-							err = txn.Delete([]byte(string(k)))
-							if err != nil {
-								return err
-							}
 						}
 
 					}
@@ -480,30 +546,141 @@ func RunDataChange(command interface{}) (err error) {
 					return err
 				}
 
+				// for _, v := range aggs {
+				// 	v2 := v.(map[string]interface{})
+
+				// 	columnNameNew := fmt.Sprintf("%v.%v", v2["column"], v2["agtype"])
+
+				// 	err = dbKV.Update(func(txn *badger.Txn) error {
+				// 		opts := badger.DefaultIteratorOptions
+				// 		opts.PrefetchSize = 10
+				// 		it := txn.NewIterator(opts)
+				// 		defer it.Close()
+				// 		for it.Rewind(); it.Valid(); it.Next() {
+				// 			item := it.Item()
+				// 			// k := item.Key()
+				// 			err := item.Value(func(v []byte) error {
+				// 				//matched db row
+
+				// 				if strings.Contains(string(v), "GROUP;Y") {
+
+				// 					getColumns := strings.Split(string(v), "|")
+
+				// 					for _, v3 := range getColumns {
+
+				// 						getColumnName := strings.Split(v3, ";")
+
+				// 						if v2["column"].(string) == getColumnName[0] {
+
+				// 							val, _ := strconv.ParseFloat(getColumnName[1], 64)
+
+				// 							switch v2["agtype"].(string) {
+				// 							case "MAX":
+				// 								old := groupList[iG][columnNameNew]
+				// 								if val > old {
+				// 									groupList[iG][columnNameNew] = val
+				// 								}
+				// 							case "MIN":
+				// 								old := groupList[iG][columnNameNew]
+				// 								if val < old {
+				// 									groupList[iG][columnNameNew] = val
+				// 								}
+				// 							case "SUM":
+				// 								// fmt.Println("MATCHED SUM-------------------")
+				// 								// groupList[iG]["SUM"] += val
+				// 								groupList[iG][columnNameNew] += val
+				// 							case "COUNT":
+				// 								// fmt.Println("------COUNT ADDD------------")
+				// 								// fmt.Println(v2)
+				// 								// fmt.Printf("%v.%v\n", v2["column"], v2["agtype"])
+				// 								groupList[iG][columnNameNew]++
+
+				// 							}
+				// 						}
+
+				// 					}
+				// 				}
+
+				// 				return nil
+				// 			})
+				// 			if err != nil {
+				// 				return err
+				// 			}
+
+				// 		}
+				// 		return nil
+				// 	})
+				// 	if err != nil {
+				// 		return err
+				// 	}
+
+				// }
+
 			}
 
-			counterA := 1
+			fmt.Println("-----------END AGG LOOP------------")
+			fmt.Println(groupList)
 
-			// fmt.Println("GROUPLIST---------------")
-			// fmt.Println(groupList)
+			nextIdex := 0
+
+			// DELETE LOOP
+			err = dbKV.Update(func(txn *badger.Txn) error {
+				opts := badger.DefaultIteratorOptions
+				opts.PrefetchSize = 10
+				it := txn.NewIterator(opts)
+				defer it.Close()
+				for it.Rewind(); it.Valid(); it.Next() {
+					item := it.Item()
+					k := item.Key()
+					err := item.Value(func(v []byte) error {
+
+						nextIdexID := strings.Split(string(k), ".")
+						counterB, _ := strconv.Atoi(nextIdexID[0])
+
+						if counterB > nextIdex {
+							nextIdex = counterB
+						}
+
+						if strings.Contains(string(v), "GROUP;Y") {
+							err = txn.Delete([]byte(string(k)))
+							if err != nil {
+								return err
+							}
+						}
+
+						return nil
+					})
+					if err != nil {
+						return err
+					}
+				}
+				return nil
+			})
+
+			// counterA := nextIdex + 1
+			nextIdex++
 
 			for i, v := range groupList {
 
-				colSplit := strings.Split(i, ";")
+				// fmt.Println("REBUILD----------------------")
+				// fmt.Println(i)
+				// fmt.Println(v)
+
+				// colSplit := strings.Split(i, ";")
 
 				var newColumns string
 				var newColumnsBuild []string
 
 				for i2, v2 := range v {
-					newColumnsBuild = append(newColumnsBuild, fmt.Sprintf("%v.%v;%v", colSplit[0], i2, v2))
+					// newColumnsBuild = append(newColumnsBuild, fmt.Sprintf("%v.%v;%v", colSplit[0], i2, v2))
+					newColumnsBuild = append(newColumnsBuild, fmt.Sprintf("%v;%v", i2, v2))
 				}
 
 				newColumns = strings.Join(newColumnsBuild, "|")
 
-				// fmt.Println(newColumns)
-
 				err = dbKV.Update(func(txn *badger.Txn) error {
-					e := badger.NewEntry([]byte(fmt.Sprintf("%02v.00", counterA)), []byte(fmt.Sprintf("%v|%v", i, newColumns))).WithTTL(time.Hour)
+					// e := badger.NewEntry([]byte(fmt.Sprintf("%02v.00", counterA)), []byte(fmt.Sprintf("%v|%v", i, newColumns))).WithTTL(time.Hour)
+					e := badger.NewEntry([]byte(fmt.Sprintf("%02v.00", nextIdex)), []byte(fmt.Sprintf("%v|%v", i, newColumns))).WithTTL(time.Hour)
 					err := txn.SetEntry(e)
 					return err
 				})
@@ -511,7 +688,8 @@ func RunDataChange(command interface{}) (err error) {
 					return err
 				}
 
-				counterA++
+				// counterA++
+				nextIdex++
 			}
 
 		case "#10#":

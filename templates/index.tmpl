@@ -664,16 +664,7 @@
         let endData = data.drawflow.Home.data;
         let list = Object.values(endData);
 
-        // console.log("------------------------");
-        // console.log(list);
-        // console.log("------------------------");
-
-        // // need to loop and re-loop until senquence is completed
-        // join need to be the stopping point down a path
-        // source(has 2 outs A and B go down A first)->dataA->filter->joinAtoB (stops here as no b yet) [source, dataA, filter]
-        // dataB->filter->JoinAtoB (can now do join) [source, dataA, filter, dataB, filter, joinAtoB]
         let startCommand;
-        // let joins = 0;
         let joinBuild = 0;
         let newDataSendBuild = [];
 
@@ -683,15 +674,11 @@
             startCommand = list[i];
           }
 
-          // if (list[i].name == "join") {
-          //   joins = joins + 1;
-          // }
-
         }
 
-        // console.log(joins);
-
         function recurse(node, filterorID) {
+
+          
 
 
               for (var i = 0; i < list.length; i++) {
@@ -703,40 +690,14 @@
                     newDataSendBuild.push(list[i]);
                   }
 
-                  // if (list[i].name == "filteror") {
-
-                  //   console.log("what to add in");
-                  //   console.log(filterorID);
-
-                  //   // newDataSendBuild.push(new Array());
-                  // }
-
                 }
               }
 
-              console.log("recurvise");
-              // console.log(node);
-              // console.log(node.outputs.output_1.connections);
-
               for(var i = 0, count = node.outputs.output_1.connections.length; i < count; i++) {
-
-                // console.log("connections");
-                // console.log(node.outputs.output_1.connections[i].node);
 
                 for (var i2 = 0; i2 < list.length; i2++) {
 
-                  // console.log("check to see RECUR add");
-                  // console.log(node.outputs.output_1.connections[i].node);
-                  // console.log("list ID");
-                  // console.log(list[i2].id);
-                  // console.log(list[i2].data.code);
-                  // console.log(list[i2].id == node.outputs.output_1.connections[i].node && list[i2].data.code != "SKIP");
-                  // console.log(list[i2].id == parseInt(node.outputs.output_1.connections[i].node) && list[i2].data.code != "SKIP");
-
-
                   if (list[i2].id == parseInt(node.outputs.output_1.connections[i].node))  {
-                    // console.log("matched");
-                    // console.log(list[i2]);
 
                     if (list[i2].name != "end") {
 
@@ -744,34 +705,11 @@
                         recurse(list[i2]);
                       }
 
-                      // if (list[i2].name == "filteror") {
-
-                      //   console.log("filerOR");
-
-                      //   // if next node is filteror
-                      //   // get number of filteror nodes and create array for that length
-                      //   newDataSendBuild.push(new Array());
-                      //   let idder = newDataSendBuild.length-1;
-                      //   recurse(list[i2], idder);
-
-
-                      // }
-
                       if (list[i2].name == "join") {
-
-                        // console.log("join bit");
-
 
                         joinBuild = joinBuild + 1;
 
-                        // console.log("joinBuild");
-                        // console.log(joinBuild);
-
                         if (joinBuild%2 == 0) {
-
-                          // console.log("2nd join in list");
-                          // console.log(list[i2]);
-
                           recurse(list[i2]);
                         }
 
@@ -787,76 +725,16 @@
               }
           }
 
-          recurse(startCommand);
-
+        recurse(startCommand);
         
 
         console.log("BUILER--------------------");
         console.log(newDataSendBuild);
 
-
-        // let endObject = {};
-        // endObject["#00#"] = [];
-        // endObject["#01#"] = [];
-        // endObject["#02#"] = [];
-        // endObject["#03#"] = [];
-        // endObject["#04#"] = [];
-        // endObject["#05#"] = [];
-        // endObject["#06#"] = [];
-        // endObject["#08#"] = [];
-        // endObject["#09#"] = [];
-        // endObject["#10#"] = [];
-        // endObject["#11#"] = [];
-        // endObject["#12#"] = [];
-        // endObject["#13#"] = [];
-
-        // let subOject = {};
-        // let subOject2 = {};
-
-
-        //  // need to look for start then get outputs field to run through the list
-        // list.forEach(function(element) {
-                
-        //         if (element.name == "start" || element.name == "end" || element.name == "datasource" || element.data.code == "#07#") {
-        //           return
-        //         }
-
-        //         if (element.data.code == "#05#") {
-        //           subOject[element.data.source] = [];
-        //         } else if (element.data.code == "#09#") {
-        //           subOject2[element.data.source] = [];
-        //         } else {
-        //           endObject[element.data.code].push(element.data);
-        //         }
-
-        // });
-
-        // list.forEach(function(element) {
-                
-        //         if (element.data.code == "#05#") {
-        //           subOject[element.data.source].push(element.data);
-        //         }
-        //         if (element.data.code == "#09#") {
-        //           subOject2[element.data.source].push(element.data);
-        //         }
-        // });
-
-        // let subList = Object.values(subOject);
-        // let subList2 = Object.values(subOject2);
-
-        // subList.forEach(function(element) {
-        //     endObject["#05#"].push(element);
-        // });
-
-        // subList2.forEach(function(element) {
-        //     endObject["#09#"].push(element);
-        // });
-
-        // console.log(endObject);
-        // console.log(newDataSend);
-
         function updater(data) {
           console.log(data);
+          notie.alert({ type: 'success', text: data });
+
         }
 
         fetch('/datarun', {
@@ -887,7 +765,7 @@
 
       if (node.inputs.input_1.connections.length == 0) {
           // document.getElementById("settings-detail").innerHTML = `<div>no connections</div>`;
-          notie.alert({ type: 'warning', text: 'no connections' })
+          notie.alert({ type: 'warning', text: 'no connections' });
           return
       }
       // document.getElementById("settings-detail").innerHTML = "";
@@ -2128,25 +2006,21 @@
                 event.preventDefault();
                 // let selectedColumns = [];
                 let values = choices.getValue(true);
+                let valuesB = choices.getValue(true);
                 let endColumn = [];
-                // let inputs = document.getElementsByClassName("gp");
+                let newCols = [];
 
-                // for(var i = 0; i < inputs.length; i++) {
-                //   if(inputs[i].type == "checkbox") {
-
-                //       if (inputs[i].checked == true) {
-                //         selectedColumns.push(inputs[i].name);
-                //       } 
-                      
-                //   }  
-                // }
-
-                // endColumn.push(selectedColumns);
                 endColumn.push(values);
-                nodeData.columns = endColumn;
+                
+                // need to add the agg columns to this
+                // nodeData.columns = endColumn;
+                nodeData.groupcolumns = endColumn;
                 nodeData.columnsorginal = parentData.columns;
                 nodeData.source = parentData.source;
                 nodeData.aggs = [];
+
+                // console.log("END-COLUMN");
+                // console.log(endColumn);
 
                 for (var i = 0; i < dataTable.data.length; i++) {
                     let d = [].slice.call(dataTable.data[i].cells).map(function(cell) { return cell.textContent;});
@@ -2155,8 +2029,13 @@
                       "column": d[1],
                     }
                     nodeData.aggs.push(mapp);
+                    valuesB.push(mapp.column + "." + d[0]);
                   }
 
+                newCols.push(valuesB);
+                nodeData.columns = newCols;
+
+                console.log(nodeData);
 
                 editor.updateNodeDataFromId(id, nodeData);  
 
@@ -2167,75 +2046,6 @@
 
           }
 
-    // function aggregateBuild(id, nodeData, parentData, parentID, parentType){
-
-    //   let inner = `<form>
-    //               <div class="row">
-    //                 <div class="column">
-    //                   <label for="ag-agtype">agtype</label>
-    //                     <select class="u-full-width" id="ag-agtype">
-    //                       <option ${(nodeData.agtype == 'MAX') ? 'selected' : ''} value="MAX">MAX</option>
-    //                       <option ${(nodeData.agtype == 'MEAN') ? 'selected' : ''} value="MEAN">MEAN</option>
-    //                       <option ${(nodeData.agtype == 'MEDIAN') ? 'selected' : ''} value="MEDIAN">MEDIAN</option>
-    //                       <option ${(nodeData.agtype == 'MIN') ? 'selected' : ''} value="MIN">MIN</option>
-    //                       <option ${(nodeData.agtype == 'STD') ? 'selected' : ''} value="STD">STD</option>
-    //                       <option ${(nodeData.agtype == 'SUM') ? 'selected' : ''} value="SUM">SUM</option>
-    //                       <option ${(nodeData.agtype == 'COUNT') ? 'selected' : ''} value="COUNT">COUNT</option>
-    //                     </select>
-    //                   <label for="ag-column">Column</label>
-    //                   <select class="u-full-width" id="ag-column">
-    //                   </select>
-    //                 </div>
-    //                 </div>
-    //               </form>
-    //               <a class="button button-primary" id="ag-save" href="#">Save</a>
-    //               `;
-
-    //     document.getElementById("settings-detail").innerHTML = inner;
-
-    //     parentData.columnsorginal[0].forEach(function(element) {
-    //       var x = document.getElementById("ag-column");
-    //         var option = document.createElement("option");
-    //         option.text = element;
-    //         option.value = element;
-
-    //         if (element == nodeData.column) {
-    //           option.selected = true;
-    //         }
-
-    //         x.add(option);
-    //     });
-
-
-    //     document.getElementById("ag-save").addEventListener("click", function (event) {
-    //         event.preventDefault();
-
-    //         nodeData.column = document.getElementById("ag-column").value;
-    //         nodeData.agtype = document.getElementById("ag-agtype").value;
-    //         nodeData.columns = parentData.columns;
-    //         nodeData.columnsorginal = parentData.columnsorginal;
-    //         nodeData.source = parentData.source;
-
-    //         if (parentType == "groupby") {
-    //           nodeData.groupbyid = parentID;
-    //         } else {
-    //           nodeData.groupbyid = parentData.groupbyid;
-    //         }
-
-    //         nodeData.columns[0].push(nodeData.column+"_"+nodeData.agtype);
-    //         editor.updateNodeDataFromId(id, nodeData);
-
-
-    //         let nodeNew = editor.getNodeFromId(nodeData.groupbyid);
-    //         nodeNew.data.aggs.push(nodeData);
-    //         editor.updateNodeDataFromId(nodeNew.id, nodeNew.data);
-
-    //         myOffsideRight.close();
-
-    //           notie.alert({ type: 'success', text: 'Added Setting to Command' });
-    //     });
-
-    //   }
 
   </script>
 </body>
