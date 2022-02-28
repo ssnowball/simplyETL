@@ -51,20 +51,22 @@ There are buttons to help you and to run your final command instructions
 - [x] Rebuild command sequencer
 - [ ] Fix command functions after rebuild
     - [x] Join
-    - [x] Select
+    - [ ] Select
+        - [x] rebuild select
+        - [ ] new select box need to only show what's been selected, not everything
     - [x] Rename
     - [x] Subset
     - [x] Arrange
     - [x] Filter
     - [ ] GroupBy
-        - [ ] rebuild to 1 command to include aggeregate
+        - [x] rebuild to 1 command to include aggeregate
         - [x] correct select command to work after groupby
-        - [ ] dealing with DATE/TIME COLUMNS ??
+        - [ ] new select box need to only show what's been selected, not everything
 - [ ] Right join / Cross join?
 - [ ] Distinct
 - [ ] Mutation of columns
 - [ ] In filter
-- [ ] Notie feedback
+- [x] Notie feedback
 - [ ] Other channels to output data - add command to list
 - [ ] Pivot data?
 - [ ] More data connections
