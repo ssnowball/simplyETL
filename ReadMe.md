@@ -57,11 +57,13 @@ There are buttons to help you and to run your final command instructions
     - [x] Rename
     - [x] Subset
     - [x] Arrange
-    - [x] Filter
-    - [x] GroupBy
+    - [ ] Filter
+        - [ ] add delete to table of or statements
+    - [ ] GroupBy
         - [x] rebuild to 1 command to include aggeregate
         - [x] correct select command to work after groupby
         - [x] new select box need to only show what's been selected, not everything
+        - [ ] add delete to table of aggs
 - [ ] Right join / Cross join?
 - [ ] Distinct
 - [ ] Mutation of columns
