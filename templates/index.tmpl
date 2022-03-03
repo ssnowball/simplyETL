@@ -152,7 +152,7 @@
       <div id="drawflow" ondrop="drop(event)" ondragover="allowDrop(event)">
 
         
-        <div class="btn-add" id="my-button"><i id="lock" class="fas fa-plus"></i></div>
+        <div class="btn-add" id="my-button">Commands</div>
         <!-- <div class="btn-export" onclick="">Export</div> -->
         <div class="btn-export" onclick="runCode(editor.export())">Run</div>
         <!-- <div class="btn-export" onclick="Swal.fire({ title: 'Export', html: '<pre><code>'+JSON.stringify(editor.export(), null,4)+'</code></pre>'})">Export</div> -->
@@ -1660,42 +1660,29 @@
           // const choices = new Choices(element);
 
           // choices.setValue(['Set value 1', 'Set value 2']);
-          choices.setValue(parentData.columns[0]);
+          // choices.setValue(parentData.columns[0]);
 
 
             // console.log(parentData.columns[0]);
 
             // let loadList = [];
 
-          // parentData.columns[0].forEach(function(element) {
-          //     // var x = document.getElementById("mr-check-loop");
-          //     // var option = document.createElement("label");
-              
-          //     // var inner = document.createElement("input");
-          //     // inner.setAttribute("type", "checkbox");
+            let newList = [];
 
-          //     // if (typeof nodeData.columns == "undefined" && nodeData.columns == null) {
-          //     //       inner.checked = true;
-          //     //     } else {                  
-          //     //       if (nodeData.columns[0].includes(element)) {
-          //     //         inner.checked = true;
-          //     //       } else {
-          //     //         inner.checked = false;
-          //     //       }
-          //     //     }
+          parentData.columns[0].forEach(function(element) {
+            newList.push(
+              { value: element, label: element, disabled: false, selected: false },
+            );
 
-          //     // inner.classList.add("mr");
-          //     // inner.name = element;
+          });
 
-          //     // var te = document.createElement("span");
-          //     te.innerText = element;
-          //     // te.classList.add("label-body");
+          choices.setChoices(newList);
 
-          //     // option.appendChild(inner);              
-          //     // option.appendChild(te);              
-
-          //     // x.appendChild(option);
-          // });
+          if (typeof nodeData.columns != 'undefined' ) {
+              nodeData.columns[0].forEach(function(element) {
+                choices.setChoiceByValue(element);
+            })
+           }
 
           document.getElementById("mr-save").addEventListener("click", function (event) {
               event.preventDefault();
@@ -1909,13 +1896,14 @@
             removeItemButton: true,
           });
 
-          // const choices = new Choices(element);
-
-          // choices.setValue(['Set value 1', 'Set value 2']);
-          choices.setValue(parentData.columns[0]);
-          // choices.unhighlightAll();
+          let newList = [];
 
           parentData.columns[0].forEach(function(element) {
+
+            newList.push(
+              { value: element, label: element, disabled: false, selected: false },
+            );
+
           var x = document.getElementById("ag-column");
             var option = document.createElement("option");
             option.text = element;
@@ -1928,37 +1916,13 @@
             x.add(option);
         });
 
+        choices.setChoices(newList);
 
-            // parentData.columns[0].forEach(function(element) {
-            //     var x = document.getElementById("gp-check-loop");
-            //     var option = document.createElement("label");
-                
-            //     var inner = document.createElement("input");
-            //     inner.setAttribute("type", "checkbox");
-
-            //     if (typeof nodeData.columns == "undefined" && nodeData.columns == null) {
-            //       inner.checked = false;
-            //     } else {
-            //       if (nodeData.columns[0].includes(element)) {
-            //         inner.checked = true;
-            //       } else {
-            //         inner.checked = false;
-            //       }
-            //     }
-
-            //     inner.classList.add("gp");
-            //     inner.name = element;
-
-            //     var te = document.createElement("span");
-            //     te.innerText = element;
-            //     te.classList.add("label-body");
-
-            //     option.appendChild(inner);              
-            //     option.appendChild(te);              
-
-            //     x.appendChild(option);
-            // });
-
+        if (typeof nodeData.groupcolumns != 'undefined' ) {
+              nodeData.groupcolumns[0].forEach(function(element) {
+                choices.setChoiceByValue(element);
+            })
+           }
             
 
             let dataTable = new simpleDatatables.DataTable("#filter-table", {
@@ -2035,7 +1999,7 @@
                 newCols.push(valuesB);
                 nodeData.columns = newCols;
 
-                console.log(nodeData);
+                // console.log(nodeData);
 
                 editor.updateNodeDataFromId(id, nodeData);  
 

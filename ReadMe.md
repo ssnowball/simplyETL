@@ -49,19 +49,19 @@ There are buttons to help you and to run your final command instructions
 
 - [ ] Union
 - [x] Rebuild command sequencer
-- [ ] Fix command functions after rebuild
+- [x] Fix command functions after rebuild
     - [x] Join
-    - [ ] Select
+    - [x] Select
         - [x] rebuild select
-        - [ ] new select box need to only show what's been selected, not everything
+        - [x] new select box need to only show what's been selected, not everything
     - [x] Rename
     - [x] Subset
     - [x] Arrange
     - [x] Filter
-    - [ ] GroupBy
+    - [x] GroupBy
         - [x] rebuild to 1 command to include aggeregate
         - [x] correct select command to work after groupby
-        - [ ] new select box need to only show what's been selected, not everything
+        - [x] new select box need to only show what's been selected, not everything
 - [ ] Right join / Cross join?
 - [ ] Distinct
 - [ ] Mutation of columns
