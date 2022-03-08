@@ -733,7 +733,7 @@
 
         function updater(data) {
           console.log(data);
-          notie.alert({ type: 'success', text: data });
+          notie.alert({ type: 'success', text: data, time: 1 });
 
         }
 
@@ -765,7 +765,7 @@
 
       if (node.inputs.input_1.connections.length == 0) {
           // document.getElementById("settings-detail").innerHTML = `<div>no connections</div>`;
-          notie.alert({ type: 'warning', text: 'no connections' });
+          notie.alert({ type: 'warning', text: 'no connections', time: 1 });
           return
       }
       // document.getElementById("settings-detail").innerHTML = "";
@@ -1194,7 +1194,7 @@
 
               myOffsideRight.close();
 
-              notie.alert({ type: 'success', text: 'Added Setting to Command' });
+              notie.alert({ type: 'success', text: 'Added Setting to Command', time: 1 });
 
             }
 
@@ -1306,7 +1306,7 @@
 
                 myOffsideRight.close();
 
-              notie.alert({ type: 'success', text: 'Added Setting to Command' });
+              notie.alert({ type: 'success', text: 'Added Setting to Command', time: 1 });
               }
 
 
@@ -1324,7 +1324,16 @@
 
         }
 
-    function filterAndBuild(id, nodeData, parentData){
+        let dataTableFilter;
+    
+    function deleteRowFilter(rowId) {
+                console.log(rowId);
+                dataTableFilter.rows().remove(rowId);
+                document.getElementById("fa-optionscount").value = dataTableFilter.data.length;
+              }
+    
+    
+        function filterAndBuild(id, nodeData, parentData){
 
         // console.log(nodeData.optionscount);
 
@@ -1356,14 +1365,15 @@
               </div>
             <div class="row"></div>
             </form>
-            <input class="u-full-width" type="number" id="fa-optionscount" value="${(nodeData.optionscount) ? nodeData.optionscount : '1'}">
+            <input class="u-full-width" type="number" id="fa-optionscount" value="${(nodeData.optionscount) ? nodeData.optionscount : '0'}">
             <div id="additionRows" hidden>
               <a class="button button-primary" id="fa-add" href="#">Add</a>
               <table id="filter-table"><thead>
                 <tr>
-                  <th>A</th>
-                  <th>B</th>
-                  <th>C</th>
+                  <th>Column</th>
+                  <th>Operator</th>
+                  <th>Value</th>
+                  <th>Delete</th>
                 </tr>
               </thead><tbody></tbody></table>
             </div>
@@ -1373,7 +1383,7 @@
 
             document.getElementById("settings-detail").innerHTML = inner;
 
-            let dataTable = new simpleDatatables.DataTable("#filter-table", {
+            dataTableFilter = new simpleDatatables.DataTable("#filter-table", {
                 searchable: false,
                 fixedHeight: false,
             });
@@ -1399,13 +1409,14 @@
 
                   for (var i = 0; i < nodeData.filters.length; i++) {
 
-                  dataTable.rows().add([
-                          nodeData.filters[0].column,
-                          nodeData.filters[0].operator,
-                          nodeData.filters[0].value
+                    dataTableFilter.rows().add([
+                          nodeData.filters[i].column,
+                          nodeData.filters[i].operator,
+                          nodeData.filters[i].value,
+                          `<button type='button' onclick="deleteRowFilter(${i})" data-row='${i}'>Y</button>`,
                     ]);
 
-                    document.getElementById("fa-optionscount").value = dataTable.data.length;
+                    document.getElementById("fa-optionscount").value = dataTableFilter.data.length;
 
                   }
 
@@ -1430,12 +1441,14 @@
             document.getElementById("fa-add").addEventListener("click", function (event) {
                 event.preventDefault();
 
-                  dataTable.rows().add([document.getElementById("fa-column").value,
+                dataTableFilter.rows().add([
+                      document.getElementById("fa-column").value,
                       document.getElementById("fa-operator").value,
-                      document.getElementById("fa-value").value
+                      document.getElementById("fa-value").value,
+                      `<button type='button' onclick="deleteRowFilter(${dataTableFilter.data.length})" data-row='${dataTableFilter.data.length}'>Y</button>`,
                   ]);
 
-                  document.getElementById("fa-optionscount").value = dataTable.data.length;
+                  document.getElementById("fa-optionscount").value = dataTableFilter.data.length;
 
 
             });
@@ -1446,8 +1459,8 @@
                 nodeData.filters = [];
 
                 if (document.getElementById("fa-type").options[document.getElementById("fa-type").selectedIndex].value == "Or") {
-                  for (var i = 0; i < dataTable.data.length; i++) {
-                    let d = [].slice.call(dataTable.data[i].cells).map(function(cell) { return cell.textContent;});
+                  for (var i = 0; i < dataTableFilter.data.length; i++) {
+                    let d = [].slice.call(dataTableFilter.data[i].cells).map(function(cell) { return cell.textContent;});
                     let mapp = {
                       "column": d[0],
                       "operator" : d[1],
@@ -1471,7 +1484,7 @@
 
                 myOffsideRight.close();
 
-              notie.alert({ type: 'success', text: 'Added Setting to Command' });
+              notie.alert({ type: 'success', text: 'Added Setting to Command' , time: 1});
             });
           }
 
@@ -1522,7 +1535,7 @@
 
                   myOffsideRight.close();
 
-              notie.alert({ type: 'success', text: 'Added Setting to Command' });
+              notie.alert({ type: 'success', text: 'Added Setting to Command', time: 1 });
               });
 
             }
@@ -1560,7 +1573,7 @@
 
             myOffsideRight.close();
 
-              notie.alert({ type: 'success', text: 'Added Setting to Command' });
+              notie.alert({ type: 'success', text: 'Added Setting to Command', time: 1 });
         });
 
       }
@@ -1583,7 +1596,7 @@
 
         document.getElementById("settings-detail").innerHTML = inner;
 
-        console.log(parentData);
+        // console.log(parentData);
 
         parentData.columns[0].forEach(function(element) {
         var x = document.getElementById("rn-column");
@@ -1628,12 +1641,12 @@
 
             myOffsideRight.close();
 
-              notie.alert({ type: 'success', text: 'Added Setting to Command' });
+              notie.alert({ type: 'success', text: 'Added Setting to Command', time: 1 });
         });
 
       }
-
-    function selectBuild(id, nodeData, parentData){
+    
+      function selectBuild(id, nodeData, parentData){
 
         let inner = `<form>
                     <div class="row">
@@ -1725,7 +1738,7 @@
 
               myOffsideRight.close();
 
-              notie.alert({ type: 'success', text: 'Added Setting to Command' });
+              notie.alert({ type: 'success', text: 'Added Setting to Command', time: 1 });
 
               
           });
@@ -1845,12 +1858,21 @@
 
             myOffsideRight.close();
 
-              notie.alert({ type: 'success', text: 'Added Setting to Command' });
+              notie.alert({ type: 'success', text: 'Added Setting to Command', time: 1 });
         });
 
       }
 
-    function groupbyBuild(id, nodeData, parentData){
+      let dataTableGroup;
+    
+      function deleteRowAggs(rowId) {
+                  console.log(rowId);
+                  dataTableGroup.rows().remove(rowId);
+                  document.getElementById("ag-optionscount").value = dataTableGroup.data.length;
+                }
+    
+    
+      function groupbyBuild(id, nodeData, parentData){
 
           let inner = `<form>
                       <div class="row">
@@ -1860,7 +1882,7 @@
                         </div>
                         <div class="row">
                         <div class="column">
-                          <label for="ag-agtype">agtype</label>
+                          <label for="ag-agtype">Aggregate</label>
                             <select class="u-full-width" id="ag-agtype">
                               <option ${(nodeData.agtype == 'SUM') ? 'selected' : ''} value="SUM">SUM</option>
                               <option ${(nodeData.agtype == 'COUNT') ? 'selected' : ''} value="COUNT">COUNT</option>
@@ -1872,13 +1894,14 @@
                         </div>
                       </div>
                       </form>
-                      <input class="u-full-width" type="number" id="ag-optionscount" value="${(nodeData.optionscount) ? nodeData.optionscount : '1'}">
+                      <input class="u-full-width" type="number" id="ag-optionscount" value="${(nodeData.optionscount) ? nodeData.optionscount : '0'}">
                       <div id="additionRows">
                         <a class="button button-primary" id="ag-add" href="#">Add</a>
                         <table id="filter-table"><thead>
                           <tr>
-                            <th>A</th>
-                            <th>B</th>
+                            <th>Aggregate</th>
+                            <th>Column</th>
+                            <th>Delete</th>
                           </tr>
                         </thead><tbody></tbody></table>
                       </div>
@@ -1890,7 +1913,8 @@
             const element = document.querySelector('#js-choice');
 
           // Calling a method directly
-          const choices = new Choices(element, {
+          const choicesGroup = new Choices(element, {
+            // const choices = new Choices(element, {
             // addItems: true,
             // removeItems: true,
             removeItemButton: true,
@@ -1916,19 +1940,23 @@
             x.add(option);
         });
 
-        choices.setChoices(newList);
+        choicesGroup.setChoices(newList);
 
         if (typeof nodeData.groupcolumns != 'undefined' ) {
               nodeData.groupcolumns[0].forEach(function(element) {
-                choices.setChoiceByValue(element);
+                choicesGroup.setChoiceByValue(element);
             })
            }
             
 
-            let dataTable = new simpleDatatables.DataTable("#filter-table", {
+           dataTableGroup = new simpleDatatables.DataTable("#filter-table", {
                 searchable: false,
                 fixedHeight: false,
             });
+
+            // function deleteAgg(rowId) {
+            //   console.log(rowId);
+            // }
 
             if (typeof nodeData.aggs != 'undefined' ) {
 
@@ -1937,12 +1965,13 @@
 
                 for (var i = 0; i < nodeData.aggs.length; i++) {
 
-                dataTable.rows().add([
-                        nodeData.aggs[0].agtype,
-                        nodeData.aggs[0].column,
+                  dataTableGroup.rows().add([
+                        nodeData.aggs[i].agtype,
+                        nodeData.aggs[i].column,
+                        `<button type='button' onclick="deleteRowAggs(${i})" data-row='${i}'>Y</button>`,
                   ]);
 
-                  document.getElementById("ag-optionscount").value = dataTable.data.length;
+                  document.getElementById("ag-optionscount").value = dataTableGroup.data.length;
 
                 }
 
@@ -1956,21 +1985,30 @@
             document.getElementById("ag-add").addEventListener("click", function (event) {
                 event.preventDefault();
 
-                  dataTable.rows().add([
+                
+
+                dataTableGroup.rows().add([
                       document.getElementById("ag-agtype").value,
-                      document.getElementById("ag-column").value
+                      document.getElementById("ag-column").value,
+                      `<button type='button' onclick="deleteRowAggs(${dataTableGroup.data.length})" data-row='${dataTableGroup.data.length}'>Y</button>`,
                   ]);
 
-                  document.getElementById("ag-optionscount").value = dataTable.data.length;
+                  // ${datatable.rows().remove(dataTable.data.length)}
+
+                  document.getElementById("ag-optionscount").value = dataTableGroup.data.length;
 
 
             });
 
+            // document.getElementById(`delete-agg-0`).addEventListener("click", function (event) {
+            //         datatable.rows().remove(dataTable.data.length);
+            //       })
+
             document.getElementById("gp-save").addEventListener("click", function (event) {
                 event.preventDefault();
                 // let selectedColumns = [];
-                let values = choices.getValue(true);
-                let valuesB = choices.getValue(true);
+                let values = choicesGroup.getValue(true);
+                let valuesB = choicesGroup.getValue(true);
                 let endColumn = [];
                 let newCols = [];
 
@@ -1986,8 +2024,8 @@
                 // console.log("END-COLUMN");
                 // console.log(endColumn);
 
-                for (var i = 0; i < dataTable.data.length; i++) {
-                    let d = [].slice.call(dataTable.data[i].cells).map(function(cell) { return cell.textContent;});
+                for (var i = 0; i < dataTableGroup.data.length; i++) {
+                    let d = [].slice.call(dataTableGroup.data[i].cells).map(function(cell) { return cell.textContent;});
                     let mapp = {
                       "agtype" : d[0],
                       "column": d[1],
@@ -2005,7 +2043,7 @@
 
                 myOffsideRight.close();
 
-              notie.alert({ type: 'success', text: 'Added Setting to Command' });
+              notie.alert({ type: 'success', text: 'Added Setting to Command', time: 1 });
             });
 
           }
