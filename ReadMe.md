@@ -72,3 +72,4 @@ There are buttons to help you and to run your final command instructions
 - [ ] Other channels to output data - add command to list
 - [ ] Pivot data?
 - [ ] More data connections
+- [] tester
